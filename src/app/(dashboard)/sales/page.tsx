@@ -9,36 +9,29 @@ export default async function SalesPage() {
   if (!session) redirect("/login");
 
   const supabase = createServiceRoleSupabaseClient();
-  const [{ data: sales }, { data: shop }] = await Promise.all([
-    supabase
-      .from("sales")
-      .select(`
-        id,
-        total_amount,
-        payment_method,
-        created_at,
-        notes,
-        bank_name,
-        sale_items (
-          quantity,
-          unit_price,
-          products ( name )
-        ),
-        credit_sales (
-          customers ( name, phone )
-        )
-      `)
-      .eq("shop_id", session.user.shopId)
-      .order("created_at", { ascending: false }),
-    supabase
-      .from("shops")
-      .select("name, phone, address")
-      .eq("id", session.user.shopId)
-      .maybeSingle(),
-  ]);
+  const { data: sales } = await supabase
+    .from("sales")
+    .select(`
+      id,
+      total_amount,
+      payment_method,
+      created_at,
+      notes,
+      bank_name,
+      sale_items (
+        quantity,
+        unit_price,
+        products ( name )
+      ),
+      credit_sales (
+        customers ( name )
+      )
+    `)
+    .eq("shop_id", session.user.shopId)
+    .order("created_at", { ascending: false });
 
   // Add type assertion since Supabase returns nested joins weirdly.
   // The client component already defines the proper type.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return <SalesList sales={(sales as any) ?? []} shop={shop ?? undefined} />;
+  return <SalesList sales={(sales as any) ?? []} />;
 }

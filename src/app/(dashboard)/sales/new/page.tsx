@@ -32,7 +32,7 @@ export default async function NewSalePage() {
       .order("name"),
     supabase
       .from("shops")
-      .select("name, phone, address, bank_accounts")
+      .select("bank_accounts")
       .eq("id", session.user.shopId)
       .single(),
     supabase
@@ -68,7 +68,6 @@ export default async function NewSalePage() {
         products={products ?? []} 
         customers={customers ?? []} 
         bankAccounts={shop?.bank_accounts ?? []}
-        shop={shop ? { name: shop.name, phone: shop.phone, address: shop.address } : undefined}
         hasSales={(salesCount ?? 0) > 0}
       />
     </div>

@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
 import { RepaymentModal } from "./RepaymentModal";
 import { deleteCustomer, updateCustomer } from "@/app/actions/customers";
 
@@ -93,17 +92,26 @@ export function CustomerProfileClient({
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState("");
   const [expandedIds, setExpandedIds] = useState<Record<string, boolean>>({});
+  const [pdfGenerating, setPdfGenerating] = useState(false);
 
   function toggleExpand(id: string) {
     setExpandedIds((prev) => ({ ...prev, [id]: !prev[id] }));
   }
 
-  // Edit Modal State
+  // Edit Customer Modal State
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editName, setEditName] = useState(customer.name);
   const [editPhone, setEditPhone] = useState(customer.phone || "");
   const [editLoading, setEditLoading] = useState(false);
   const [editError, setEditError] = useState("");
+
+  // Editable PDF Reminder Template & Payment Details State (Phase 2)
+  const shopName = shop?.name || "Our Shop";
+  const defaultBank = shop?.bankAccounts && shop.bankAccounts.length > 0 ? shop.bankAccounts[0] : "";
+  const [customReminderText, setCustomReminderText] = useState(
+    `Hello ${customer.name}, this is a friendly debt payment reminder regarding your outstanding balance of ${formatNaira(customer.total_debt)} with ${shopName}. Please review the itemized breakdown below.`
+  );
+  const [customBankDetails, setCustomBankDetails] = useState(defaultBank);
 
   async function handleSaveCustomer(e: React.FormEvent) {
     e.preventDefault();
@@ -151,6 +159,43 @@ export function CustomerProfileClient({
     }
   }
 
+  // Generate Real Downloadable PDF file (Phase 2)
+  async function handleDownloadPDF() {
+    const element = document.getElementById("pdf-invoice-document");
+    if (!element) return;
+
+    setPdfGenerating(true);
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      if (!(window as any).html2pdf) {
+        await new Promise<void>((resolve, reject) => {
+          const script = document.createElement("script");
+          script.src = "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js";
+          script.onload = () => resolve();
+          script.onerror = () => reject(new Error("Failed to load PDF generator library."));
+          document.body.appendChild(script);
+        });
+      }
+
+      const cleanFileName = `${customer.name.replace(/[^a-zA-Z0-9]/g, "_")}_Debt_Invoice.pdf`;
+      const opt = {
+        margin: [10, 10, 10, 10],
+        filename: cleanFileName,
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, logging: false },
+        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+      };
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (window as any).html2pdf().set(opt).from(element).save();
+      setPdfGenerating(false);
+    } catch (err) {
+      console.error("PDF generation failed, falling back to window.print():", err);
+      setPdfGenerating(false);
+      window.print();
+    }
+  }
+
   // Aggregate all items purchased across credit history
   const allCreditItems: { name: string; qty: number; unitPrice: number; total: number; date: string }[] = [];
   for (const record of creditHistory) {
@@ -171,7 +216,6 @@ export function CustomerProfileClient({
 
   const totalCreditAmount = creditHistory.reduce((sum, r) => sum + r.amount, 0);
   const totalRepaidAmount = creditHistory.reduce((sum, r) => sum + r.amount_paid, 0);
-  const shopName = shop?.name || "Our Shop";
   const bankList = shop?.bankAccounts || [];
 
   return (
@@ -308,16 +352,18 @@ export function CustomerProfileClient({
         </div>
       )}
 
-      {/* ── Official SalesOS Debt Invoice & Payment Reminder PDF Modal ── */}
+      {/* ── Phase 2: PDF Generation & Customization Modal ── */}
       {statementModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl max-w-xl w-full p-6 border shadow-2xl space-y-5 max-h-[92vh] overflow-y-auto" style={{ borderColor: "var(--border-color)" }}>
+          <div className="bg-white rounded-2xl max-w-xl w-full p-5 border shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto" style={{ borderColor: "var(--border-color)" }}>
             <div className="flex items-center justify-between border-b pb-3" style={{ borderColor: "var(--border-color)" }}>
-              <div className="flex items-center gap-2">
-                <Image src="/logo.png" alt="SalesOS Logo" width={28} height={28} className="rounded-xl" />
+              <div>
                 <h3 className="font-bold text-base" style={{ color: "var(--text-primary)" }}>
-                  Debt Reminder Invoice & Statement
+                  Debt Invoice PDF Generator
                 </h3>
+                <p className="text-[11px]" style={{ color: "var(--text-muted)" }}>
+                  Customize payment details and message before downloading
+                </p>
               </div>
               <button
                 type="button"
@@ -328,58 +374,103 @@ export function CustomerProfileClient({
               </button>
             </div>
 
-            {/* Printable PDF Invoice Document Container */}
-            <div id="printable-statement" className="bg-white p-4 space-y-5 text-xs text-stone-800 rounded-xl border border-stone-200">
+            {/* Editable Configuration Controls */}
+            <div className="space-y-3 bg-stone-50 p-3.5 rounded-2xl border border-stone-100 text-xs">
+              <div>
+                <label className="block font-bold text-stone-700 mb-1">
+                  Customize Reminder Message
+                </label>
+                <textarea
+                  rows={2}
+                  value={customReminderText}
+                  onChange={(e) => setCustomReminderText(e.target.value)}
+                  className="w-full rounded-xl border border-stone-200 p-2.5 text-xs text-stone-900 bg-white focus:outline-none focus:border-amber-500"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-stone-700 mb-1">
+                  Payment Bank Account Details
+                </label>
+                {bankList.length > 0 ? (
+                  <select
+                    value={customBankDetails}
+                    onChange={(e) => setCustomBankDetails(e.target.value)}
+                    className="w-full rounded-xl border border-stone-200 p-2.5 text-xs text-stone-900 bg-white focus:outline-none focus:border-amber-500"
+                  >
+                    {bankList.map((b, i) => (
+                      <option key={i} value={b}>
+                        {b}
+                      </option>
+                    ))}
+                    <option value="">Custom Bank Entry...</option>
+                  </select>
+                ) : null}
+
+                {(!customBankDetails || bankList.length === 0) && (
+                  <input
+                    type="text"
+                    value={customBankDetails}
+                    onChange={(e) => setCustomBankDetails(e.target.value)}
+                    placeholder="e.g. GTBank - 0123456789 (SalesOS Shop)"
+                    className="w-full mt-2 rounded-xl border border-stone-200 p-2.5 text-xs text-stone-900 bg-white focus:outline-none focus:border-amber-500"
+                  />
+                )}
+              </div>
+            </div>
+
+            {/* Printable & Downloadable Clean PDF Document (Phase 2: Borderless, Elegant White, No Top SalesOS Logo) */}
+            <div id="pdf-invoice-document" className="bg-white p-6 space-y-6 text-xs text-stone-800">
               
-              {/* Header: Shop Info & SalesOS Branding */}
-              <div className="flex justify-between items-start border-b pb-4 border-stone-200">
+              {/* Clean Header: Shop Info ONLY (No SalesOS Logo at header) */}
+              <div className="flex justify-between items-start border-b border-stone-100 pb-4">
                 <div>
-                  <h2 className="font-black text-lg text-stone-900 leading-tight">{shopName}</h2>
-                  {shop?.phone && <p className="text-stone-500 mt-0.5">Phone: {shop.phone}</p>}
+                  <h2 className="font-black text-xl text-stone-900 tracking-tight leading-tight">{shopName}</h2>
+                  {shop?.phone && <p className="text-stone-500 mt-1">Phone: {shop.phone}</p>}
                   {shop?.address && <p className="text-stone-500">{shop.address}</p>}
                 </div>
                 <div className="text-right">
-                  <div className="flex items-center justify-end gap-1.5 mb-1">
-                    <Image src="/logo.png" alt="SalesOS" width={20} height={20} className="rounded-md" />
-                    <span className="font-extrabold text-xs tracking-tight text-amber-600">DEBT REMINDER INVOICE</span>
-                  </div>
-                  <p className="text-[10px] text-stone-400">Date: {new Date().toLocaleDateString("en-NG", { month: "short", day: "numeric", year: "numeric" })}</p>
+                  <span className="font-black text-sm tracking-wider uppercase text-amber-600 block mb-0.5">
+                    DEBT INVOICE
+                  </span>
+                  <p className="text-[11px] text-stone-400">
+                    Date: {new Date().toLocaleDateString("en-NG", { month: "short", day: "numeric", year: "numeric" })}
+                  </p>
                 </div>
               </div>
 
-              {/* Debt Reminder Notice Box */}
-              <div className="p-3.5 rounded-xl bg-amber-50/80 border border-amber-200 text-amber-900 space-y-1">
-                <p className="font-bold text-xs">Payment Reminder Notice</p>
-                <p className="text-[11px] leading-relaxed text-amber-800">
-                  Dear <strong>{customer.name}</strong>, this is a friendly debt payment reminder regarding your outstanding balance of <strong>{formatNaira(customer.total_debt)}</strong> with <strong>{shopName}</strong>. Please review the itemized breakdown and repayment account details below. Thank you for your prompt settlement!
+              {/* Debtor Details & Reminder Text */}
+              <div className="space-y-1.5 pt-1">
+                <div className="flex justify-between items-baseline">
+                  <p className="text-sm font-bold text-stone-900">Billed To: {customer.name}</p>
+                  {customer.phone && <p className="text-xs text-stone-500">{customer.phone}</p>}
+                </div>
+                <p className="text-xs leading-relaxed text-stone-600 py-2">
+                  {customReminderText}
                 </p>
               </div>
 
-              {/* Repayment Bank Details Box */}
-              {bankList.length > 0 && (
-                <div className="p-3 rounded-xl bg-blue-50/70 border border-blue-200 text-blue-900 space-y-1.5">
-                  <p className="font-bold text-xs flex items-center gap-1 text-blue-900">
-                    <span>🏦</span> Bank Account(s) for Debt Repayment:
+              {/* Repayment Bank Details */}
+              {customBankDetails && (
+                <div className="py-2.5 px-3.5 bg-stone-50 rounded-xl space-y-1">
+                  <p className="font-bold text-[11px] text-stone-700 uppercase tracking-wider">
+                    Bank Repayment Account:
                   </p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {bankList.map((bank, idx) => (
-                      <div key={idx} className="p-2 rounded-lg bg-white border border-blue-100 font-semibold text-xs text-blue-950">
-                        {bank}
-                      </div>
-                    ))}
-                  </div>
+                  <p className="font-semibold text-xs text-stone-900">
+                    {customBankDetails}
+                  </p>
                 </div>
               )}
 
-              {/* Itemized Credit Purchases Table */}
-              <div>
-                <p className="font-bold text-xs uppercase tracking-wider text-stone-700 mb-2">Itemized Purchase Log</p>
+              {/* Itemized Purchase Table (Borderless & Elegant) */}
+              <div className="pt-2">
+                <p className="font-bold text-xs uppercase tracking-wider text-stone-700 mb-3">Itemized Purchase Statement</p>
                 {allCreditItems.length === 0 ? (
                   <p className="text-stone-400 italic py-2">No itemized credit purchases found.</p>
                 ) : (
                   <table className="w-full text-left border-collapse text-xs">
                     <thead>
-                      <tr className="border-b border-stone-200 text-stone-500 font-bold uppercase text-[10px]">
+                      <tr className="border-b border-stone-200 text-stone-400 font-semibold text-[10px] uppercase">
                         <th className="py-2">Date</th>
                         <th className="py-2">Item Description</th>
                         <th className="py-2 text-center">Qty</th>
@@ -390,11 +481,11 @@ export function CustomerProfileClient({
                     <tbody className="divide-y divide-stone-100">
                       {allCreditItems.map((item, idx) => (
                         <tr key={idx}>
-                          <td className="py-2 text-stone-400">{item.date}</td>
-                          <td className="py-2 font-semibold text-stone-900">{item.name}</td>
-                          <td className="py-2 text-center font-bold">{item.qty}</td>
-                          <td className="py-2 text-right">{formatNaira(item.unitPrice)}</td>
-                          <td className="py-2 text-right font-bold text-stone-900">{formatNaira(item.total)}</td>
+                          <td className="py-2.5 text-stone-400">{item.date}</td>
+                          <td className="py-2.5 font-semibold text-stone-900">{item.name}</td>
+                          <td className="py-2.5 text-center font-bold">{item.qty}</td>
+                          <td className="py-2.5 text-right text-stone-600">{formatNaira(item.unitPrice)}</td>
+                          <td className="py-2.5 text-right font-bold text-stone-900">{formatNaira(item.total)}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -402,35 +493,34 @@ export function CustomerProfileClient({
                 )}
               </div>
 
-              {/* Financial Totals Summary */}
-              <div className="pt-3 border-t border-stone-200 space-y-1.5 text-right">
-                <div className="flex justify-between text-xs text-stone-600">
+              {/* Financial Totals */}
+              <div className="pt-4 border-t border-stone-100 space-y-1.5 text-right">
+                <div className="flex justify-between text-xs text-stone-500">
                   <span>Total Credit Purchases:</span>
-                  <span className="font-semibold">{formatNaira(totalCreditAmount)}</span>
+                  <span className="font-semibold text-stone-800">{formatNaira(totalCreditAmount)}</span>
                 </div>
-                <div className="flex justify-between text-xs text-stone-600">
+                <div className="flex justify-between text-xs text-stone-500">
                   <span>Total Payments Received:</span>
-                  <span className="font-semibold text-emerald-700">-{formatNaira(totalRepaidAmount)}</span>
+                  <span className="font-semibold text-emerald-600">-{formatNaira(totalRepaidAmount)}</span>
                 </div>
-                <div className="flex justify-between text-sm font-black pt-2 border-t border-dashed border-stone-300 text-amber-700">
-                  <span>Outstanding Amount Due:</span>
+                <div className="flex justify-between text-sm font-black pt-2 border-t border-stone-200 text-amber-600">
+                  <span>Outstanding Balance Due:</span>
                   <span>{formatNaira(customer.total_debt)}</span>
                 </div>
               </div>
 
               {/* Footer: SalesOS Branding Visibility */}
-              <div className="pt-4 border-t border-stone-200 text-center space-y-1">
-                <div className="flex items-center justify-center gap-1.5 text-stone-400 text-[11px] font-semibold">
-                  <Image src="/logo.png" alt="SalesOS" width={16} height={16} className="rounded-md" />
-                  <span>Powered & Created by SalesOS</span>
-                </div>
+              <div className="pt-6 border-t border-stone-100 text-center space-y-1">
+                <p className="text-[11px] font-medium text-stone-400">
+                  Created by <span className="font-bold text-stone-700">SalesOS</span> • Simple POS & Inventory Software
+                </p>
                 <p className="text-[10px] text-stone-400">
-                  Manage your business seamlessly • <a href="https://salesos.ng" target="_blank" rel="noopener noreferrer" className="underline font-bold text-amber-600">salesos.ng</a>
+                  Visit <a href="https://salesos.ng" target="_blank" rel="noopener noreferrer" className="font-bold text-amber-600 underline">salesos.ng</a>
                 </p>
               </div>
             </div>
 
-            {/* Modal Action Buttons */}
+            {/* Modal Actions */}
             <div className="flex gap-2.5 pt-2 border-t" style={{ borderColor: "var(--border-color)" }}>
               <button
                 type="button"
@@ -440,16 +530,34 @@ export function CustomerProfileClient({
               >
                 Close
               </button>
+
+              {customer.phone && (
+                <a
+                  href={`https://wa.me/${customer.phone.replace(/\D/g, "")}?text=${encodeURIComponent(
+                    `${customReminderText}\n\nBank Repayment Details: ${customBankDetails || "Contact shop"}\n\nOutstanding Debt: ${formatNaira(customer.total_debt)}`
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3.5 py-2.5 bg-[#25D366] hover:bg-[#20bd5a] text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-xs"
+                >
+                  <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                    <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.105 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z" />
+                  </svg>
+                  <span>Share Note</span>
+                </a>
+              )}
+
               <button
                 type="button"
-                onClick={() => window.print()}
-                className="flex-1 py-2.5 rounded-xl text-xs font-bold text-white transition-all active:scale-[0.98] shadow-sm flex items-center justify-center gap-2"
+                disabled={pdfGenerating}
+                onClick={handleDownloadPDF}
+                className="flex-1 py-2.5 rounded-xl text-xs font-bold text-white transition-all active:scale-[0.98] disabled:opacity-50 shadow-sm flex items-center justify-center gap-2"
                 style={{ background: "var(--accent)" }}
               >
                 <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-                  <path fillRule="evenodd" d="M7.875 1.5C6.839 1.5 6 2.34 6 3.375v2.25H3.375C2.339 5.625 1.5 6.465 1.5 7.5v6.75c0 1.035.84 1.875 1.875 1.875H6v2.25c0 1.036.84 1.875 1.875 1.875h8.25c1.035 0 1.875-.84 1.875-1.875v-2.25h2.625c1.035 0 1.875-.84 1.875-1.875V7.5c0-1.035-.84-1.875-1.875-1.875H18v-2.25C18 2.34 17.16 1.5 16.125 1.5h-8.25zM16.5 7.5V3.375a.375.375 0 00-.375-.375h-8.25a.375.375 0 00-.375.375V7.5h9z" clipRule="evenodd" />
+                  <path fillRule="evenodd" d="M12 2.25a.75.75 0 01.75.75v11.69l3.22-3.22a.75.75 0 111.06 1.06l-4.5 4.5a.75.75 0 01-1.06 0l-4.5-4.5a.75.75 0 111.06-1.06l3.22 3.22V3a.75.75 0 01.75-.75zm-9 13.5a.75.75 0 01.75.75v2.25a1.5 1.5 0 001.5 1.5h13.5a1.5 1.5 0 001.5-1.5V16.5a.75.75 0 011.5 0v2.25a3 3 0 01-3 3H5.25a3 3 0 01-3-3V16.5a.75.75 0 01.75-.75z" clipRule="evenodd" />
                 </svg>
-                Print / Download PDF
+                {pdfGenerating ? "Generating PDF..." : "Download PDF File"}
               </button>
             </div>
           </div>
@@ -531,7 +639,7 @@ export function CustomerProfileClient({
 
       {/* ── Total Debt Card (Phase 1 Premium Redesign) ── */}
       <div
-        className="p-5 sm:p-6 rounded-3xl border bg-white space-y-4 transition-all"
+        className="p-5 sm:p-6 rounded-2xl border bg-white space-y-4 transition-all"
         style={{
           borderColor: customer.total_debt > 0 ? "var(--warning-border)" : "var(--border-color)",
           boxShadow: "var(--card-shadow)",
@@ -549,6 +657,23 @@ export function CustomerProfileClient({
               Total Outstanding Debt
             </span>
           </div>
+
+          {customer.phone && customer.total_debt > 0 && (
+            <a
+              href={`https://wa.me/${customer.phone.replace(/\D/g, "")}?text=${encodeURIComponent(
+                `Hello ${customer.name}, this is a friendly debt payment reminder from ${shopName} regarding your outstanding balance of ${formatNaira(customer.total_debt)}. Please let us know when you will be settling this. Thank you!`
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-3.5 py-1.5 bg-[#25D366] hover:bg-[#20bd5a] text-white rounded-full text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm active:scale-[0.97]"
+              title="Send WhatsApp Debt Reminder"
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.105 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z" />
+              </svg>
+              <span>WhatsApp Reminder</span>
+            </a>
+          )}
         </div>
 
         <div>
@@ -590,60 +715,6 @@ export function CustomerProfileClient({
           </button>
         </div>
       </div>
-
-      {/* ── WhatsApp Reminder Card (Inspired by Modern Mobile Widget Cards) ── */}
-      {customer.phone && customer.total_debt > 0 && (
-        <div
-          className="rounded-3xl bg-white p-5 border border-stone-200/90 shadow-sm space-y-3.5 transition-all"
-        >
-          {/* Header Row: Icon + Title | Action Indicator */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-full bg-emerald-50 text-[#25D366] flex items-center justify-center flex-shrink-0 border border-emerald-100">
-                <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5">
-                  <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.105 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z" />
-                </svg>
-              </div>
-              <span className="font-bold text-sm text-stone-900 tracking-tight">WhatsApp Reminder</span>
-            </div>
-            <a
-              href={`https://wa.me/${customer.phone.replace(/\D/g, "")}?text=${encodeURIComponent(
-                `Hello ${customer.name}, this is a friendly debt payment reminder from ${shopName} regarding your outstanding balance of ${formatNaira(customer.total_debt)}. Please let us know when you will be settling this. Thank you!`
-              )}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs font-semibold text-stone-400 hover:text-emerald-600 flex items-center gap-0.5 transition-colors"
-            >
-              <span>Instant Send</span>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} className="w-3.5 h-3.5">
-                <path d="M9 18l6-6-6-6" />
-              </svg>
-            </a>
-          </div>
-
-          {/* Main Content Area Row */}
-          <div className="flex items-end justify-between gap-4 pt-1">
-            <div className="min-w-0 flex-1">
-              <p className="text-lg font-bold text-stone-900 leading-snug tracking-tight">Send Payment Notice</p>
-              <p className="text-xs text-stone-400 mt-0.5 font-medium truncate">Auto-formatted for {formatNaira(customer.total_debt)} balance</p>
-            </div>
-
-            <a
-              href={`https://wa.me/${customer.phone.replace(/\D/g, "")}?text=${encodeURIComponent(
-                `Hello ${customer.name}, this is a friendly debt payment reminder from ${shopName} regarding your outstanding balance of ${formatNaira(customer.total_debt)}. Please let us know when you will be settling this. Thank you!`
-              )}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-4 py-2.5 bg-[#25D366] hover:bg-[#20bd5a] text-white rounded-2xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-xs active:scale-[0.97] flex-shrink-0"
-            >
-              <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-                <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.105 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z" />
-              </svg>
-              <span>Send Notice</span>
-            </a>
-          </div>
-        </div>
-      )}
 
       {/* ── Credit History Log ── */}
       <div className="space-y-3">

@@ -7,7 +7,6 @@ import { recordSale } from "@/app/actions/sales";
 import { db } from "@/lib/offline-db";
 import { useLiveQuery } from "dexie-react-hooks";
 import { DismissableHelpBanner } from "@/components/ui/DismissableHelpBanner";
-import { ReceiptModal, ReceiptData } from "@/components/ui/ReceiptModal";
 
 export type ProductMini = {
   id: string;
@@ -25,7 +24,6 @@ type Props = {
   products: ProductMini[];
   customers: CustomerMini[];
   bankAccounts: string[];
-  shop?: { name: string; phone?: string | null; address?: string | null };
   hasSales?: boolean;
 };
 
@@ -41,11 +39,10 @@ function formatNaira(n: number) {
   return "₦" + new Intl.NumberFormat("en-US").format(Math.round(n));
 }
 
-export function POSClient({ products, customers, bankAccounts, shop, hasSales = false }: Props) {
+export function POSClient({ products, customers, bankAccounts, hasSales = false }: Props) {
   const router = useRouter();
 
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [completedReceipt, setCompletedReceipt] = useState<ReceiptData | null>(null);
   const [productQuery, setProductQuery] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<"cash" | "transfer" | "credit">("cash");
   const [selectedBank, setSelectedBank] = useState("");
@@ -265,52 +262,16 @@ export function POSClient({ products, customers, bankAccounts, shop, hasSales = 
         return;
       }
 
-      let custName: string | undefined;
-      let custPhone: string | undefined;
-      if (paymentMethod === "credit") {
-        if (customerMode === "existing") {
-          const found = customers.find((c) => c.id === selectedCustomerId);
-          custName = found?.name;
-        } else if (customerMode === "new") {
-          custName = newCustomerName;
-          custPhone = newCustomerPhone;
-        }
-      }
-
-      const receiptData: ReceiptData = {
-        shopName: shop?.name,
-        shopPhone: shop?.phone,
-        shopAddress: shop?.address,
-        date: new Date().toISOString(),
-        paymentMethod,
-        bankName: paymentMethod === "transfer" ? selectedBank : undefined,
-        customerName: custName,
-        customerPhone: custPhone,
-        items: cart.map((c) => ({
-          name: c.name,
-          quantity: c.quantity,
-          unitPrice: c.unitPrice,
-          total: c.unitPrice * c.quantity,
-        })),
-        totalAmount: cart.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0),
-        notes,
-      };
-
-      setCompletedReceipt(receiptData);
+      setCart([]);
+      setNotes("");
+      setAmountPaid("");
+      setSelectedBank("");
+      router.refresh();
+      router.push("/sales");
     } catch (err: unknown) {
       setLoading(false);
       setError(err instanceof Error ? err.message : "Failed to record sale. Please try again.");
     }
-  }
-
-  function handleCloseReceipt() {
-    setCompletedReceipt(null);
-    setCart([]);
-    setNotes("");
-    setAmountPaid("");
-    setSelectedBank("");
-    router.refresh();
-    router.push("/sales");
   }
 
   return (
@@ -804,14 +765,6 @@ export function POSClient({ products, customers, bankAccounts, shop, hasSales = 
           </div>
         </div>
       </form>
-
-      {/* ── Digital Sales Receipt Modal ── */}
-      {completedReceipt && (
-        <ReceiptModal
-          receipt={completedReceipt}
-          onClose={handleCloseReceipt}
-        />
-      )}
     </div>
   );
 }

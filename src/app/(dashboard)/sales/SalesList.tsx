@@ -4,7 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { voidSale } from "@/app/actions/sales";
-import { ReceiptModal, ReceiptData } from "@/components/ui/ReceiptModal";
 
 export type SaleRow = {
   id: string;
@@ -74,18 +73,11 @@ function PaymentBadge({ method, bankName }: { method: string; bankName?: string 
   );
 }
 
-export function SalesList({
-  sales,
-  shop,
-}: {
-  sales: SaleRow[];
-  shop?: { name: string; phone?: string | null; address?: string | null };
-}) {
+export function SalesList({ sales }: { sales: SaleRow[] }) {
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [paymentFilter, setPaymentFilter] = useState<"all" | "cash" | "transfer" | "credit">("all");
   const [confirmSale, setConfirmSale] = useState<SaleRow | null>(null);
-  const [activeReceipt, setActiveReceipt] = useState<ReceiptData | null>(null);
   const [voiding, setVoiding] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -441,42 +433,6 @@ export function SalesList({
                   <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
                     <div className="flex items-center gap-1.5">
                       <PaymentBadge method={sale.payment_method} bankName={sale.bank_name} />
-                      
-                      {/* Receipt Button */}
-                      {!isVoided && (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const custObj = sale.credit_sales?.[0]?.customers;
-                            setActiveReceipt({
-                              shopName: shop?.name,
-                              shopPhone: shop?.phone,
-                              shopAddress: shop?.address,
-                              saleId: sale.id,
-                              date: sale.created_at,
-                              paymentMethod: sale.payment_method,
-                              bankName: sale.bank_name,
-                              customerName: custObj?.name,
-                              customerPhone: custObj?.phone,
-                              items: sale.sale_items.map((i) => ({
-                                name: i.products?.name || "Item",
-                                quantity: i.quantity,
-                                unitPrice: i.unit_price,
-                                total: i.unit_price * i.quantity,
-                              })),
-                              totalAmount: sale.total_amount,
-                              notes: cleanNotes,
-                            });
-                          }}
-                          className="text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-stone-200 text-stone-700 bg-white hover:bg-stone-50 active:scale-[0.97] transition-all flex items-center gap-1 shadow-2xs"
-                          title="View & Share Digital Sales Receipt"
-                        >
-                          <svg viewBox="0 0 24 24" fill="currentColor" className="w-3 h-3 text-amber-600">
-                            <path fillRule="evenodd" d="M5.625 1.5c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V12.75A3.75 3.75 0 0016.5 9h-1.875a.375.375 0 01-.375-.375V6.75A3.75 3.75 0 0010.5 3H5.625z" clipRule="evenodd" />
-                          </svg>
-                          <span>Receipt</span>
-                        </button>
-                      )}
 
                       {canVoid && (
                         <button
@@ -591,14 +547,6 @@ export function SalesList({
             </div>
           </div>
         </div>
-      )}
-
-      {/* ── Digital Sales Receipt Modal ── */}
-      {activeReceipt && (
-        <ReceiptModal
-          receipt={activeReceipt}
-          onClose={() => setActiveReceipt(null)}
-        />
       )}
     </div>
   );
