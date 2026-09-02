@@ -168,7 +168,7 @@ export function SearchMonthToolbar({
             )}
           </div>
 
-          {/* Compact Month Stepper (No icon artifact, tight padding) */}
+          {/* Compact Month Stepper with Clean Calendar Icon */}
           <div className="flex items-center gap-1 flex-shrink-0">
             {/* Previous Month Arrow */}
             <button
@@ -183,7 +183,7 @@ export function SearchMonthToolbar({
               </svg>
             </button>
 
-            {/* Month Label Pill — Clean, Compact, No Icons */}
+            {/* Month Label Pill — Crisp Calendar Icon + Month Label */}
             <button
               type="button"
               onClick={() => {
@@ -193,7 +193,7 @@ export function SearchMonthToolbar({
                   onMonthChange(null);
                 }
               }}
-              className="px-3 py-1.5 rounded-full border font-extrabold text-xs transition-colors shadow-2xs select-none truncate text-center"
+              className="px-3 py-1.5 rounded-full border font-extrabold text-xs transition-colors shadow-2xs select-none truncate flex items-center gap-1.5"
               style={{
                 background: isAll ? "var(--bg-surface)" : "var(--accent-dim)",
                 borderColor: isAll ? "var(--border-color)" : "var(--accent-border)",
@@ -201,7 +201,10 @@ export function SearchMonthToolbar({
               }}
               title={isAll ? "Switch to month filter" : "Show all time"}
             >
-              {isAll ? "All Time" : getMonthLabel(activeYM)}
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5 flex-shrink-0 opacity-90">
+                <path fillRule="evenodd" d="M6.75 2.25A.75.75 0 017.5 3v1.5h9V3a.75.75 0 011.5 0v1.5h.75A2.25 2.25 0 0121 6.75v10.5a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 17.25V6.75A2.25 2.25 0 015.25 4.5h.75V3a.75.75 0 01.75-.75zm12 4.5H5.25a.75.75 0 00-.75.75v.75h15V7.5a.75.75 0 00-.75-.75zM4.5 10.5v6.75c0 .414.336.75.75.75h13.5a.75.75 0 00.75-.75V10.5H4.5z" clipRule="evenodd" />
+              </svg>
+              <span>{isAll ? "All Time" : getMonthLabel(activeYM)}</span>
             </button>
 
             {/* Next Month Arrow */}
