@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { updateExpense, deleteExpense } from "@/app/actions/expenses";
+import { SearchMonthToolbar } from "@/components/ui/SearchMonthToolbar";
 
 type ExpenseRow = {
   id: string;
@@ -23,6 +24,15 @@ function getLagosTodayISO(): string {
     day: "2-digit",
   });
   return formatter.format(new Date()); // YYYY-MM-DD
+}
+
+function getLagosCurrentYM(): string {
+  const formatter = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Africa/Lagos",
+    year: "numeric",
+    month: "2-digit",
+  });
+  return formatter.format(new Date()); // YYYY-MM
 }
 
 function isDateInPeriod(dateStr: string, period: DatePeriod): boolean {
@@ -101,7 +111,9 @@ function CategoryBgColor(category: string): string {
 
 export function ExpenseList({ expenses }: { expenses: ExpenseRow[] }) {
   const router = useRouter();
-  const [period, setPeriod] = useState<DatePeriod>("this_month");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedMonth, setSelectedMonth] = useState<string | null>(getLagosCurrentYM());
+  const [period, setPeriod] = useState<DatePeriod | "month">("month");
   const [categoryFilter, setCategoryFilter] = useState("All");
 
   // Edit State
@@ -113,7 +125,7 @@ export function ExpenseList({ expenses }: { expenses: ExpenseRow[] }) {
   const [savingEdit, setSavingEdit] = useState(false);
   const [editError, setEditError] = useState("");
 
-  // Delete Confirmation Modal State (replaces native confirm/alert)
+  // Delete Confirmation Modal State
   const [deleteConfirmExpense, setDeleteConfirmExpense] = useState<ExpenseRow | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState("");
@@ -122,9 +134,26 @@ export function ExpenseList({ expenses }: { expenses: ExpenseRow[] }) {
   const editCategories = ["Rent", "Stock", "Transport", "Salary", "Other"];
 
   const filtered = expenses.filter((e) => {
-    const matchCategory = categoryFilter === "All" || e.category === categoryFilter;
-    const matchPeriod = isDateInPeriod(e.date, period);
-    return matchCategory && matchPeriod;
+    // 1. Category Filter
+    if (categoryFilter !== "All" && e.category !== categoryFilter) return false;
+
+    // 2. Month Filter (if selected) or Date Period
+    if (selectedMonth !== null) {
+      if (!e.date.startsWith(selectedMonth)) return false;
+    } else if (period !== "month") {
+      if (!isDateInPeriod(e.date, period as DatePeriod)) return false;
+    }
+
+    // 3. Search Query Filter
+    if (searchQuery.trim()) {
+      const term = searchQuery.toLowerCase();
+      const matchDesc = e.description?.toLowerCase().includes(term);
+      const matchCat = e.category?.toLowerCase().includes(term);
+      const matchAmt = String(e.amount).includes(term);
+      if (!matchDesc && !matchCat && !matchAmt) return false;
+    }
+
+    return true;
   });
 
   const totalFilteredAmount = filtered.reduce((sum, e) => sum + (e.amount || 0), 0);
@@ -200,12 +229,9 @@ export function ExpenseList({ expenses }: { expenses: ExpenseRow[] }) {
     }
   }
 
-  const periodLabels: Record<DatePeriod, string> = {
-    today: "Expenses Today",
-    this_week: "Expenses This Week",
-    this_month: "Expenses This Month",
-    all: "All Recorded Expenses",
-  };
+  const periodLabel = selectedMonth
+    ? `Expenses (${new Date(selectedMonth + "-01").toLocaleDateString("en-NG", { month: "long", year: "numeric" })})`
+    : "All Time Expenses";
 
   return (
     <div className="space-y-4">
@@ -232,22 +258,37 @@ export function ExpenseList({ expenses }: { expenses: ExpenseRow[] }) {
         </Link>
       </div>
 
+      {/* ── Search Bar + Month Filter Toolbar ── */}
+      <SearchMonthToolbar
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        selectedMonth={selectedMonth}
+        onMonthChange={setSelectedMonth}
+        placeholder="Search expenses by note, category, or amount..."
+      />
+
       {/* ── Period Selector Buttons ── */}
       <div className="grid grid-cols-4 gap-1 p-1 rounded-2xl border bg-stone-100/70" style={{ borderColor: "var(--border-color)" }}>
-        {(["today", "this_week", "this_month", "all"] as DatePeriod[]).map((p) => (
-          <button
-            key={p}
-            type="button"
-            onClick={() => setPeriod(p)}
-            className={`py-2 rounded-xl text-xs font-bold transition-all ${
-              period === p
-                ? "bg-white text-stone-900 shadow-2xs"
-                : "text-stone-500 hover:text-stone-800"
-            }`}
-          >
-            {p === "today" ? "Today" : p === "this_week" ? "This Week" : p === "this_month" ? "This Month" : "All"}
-          </button>
-        ))}
+        {(["today", "this_week", "this_month", "all"] as DatePeriod[]).map((p) => {
+          const isActive = selectedMonth === null && period === p;
+          return (
+            <button
+              key={p}
+              type="button"
+              onClick={() => {
+                setSelectedMonth(null);
+                setPeriod(p);
+              }}
+              className={`py-1.5 rounded-xl text-xs font-bold transition-all ${
+                isActive
+                  ? "bg-white text-stone-900 shadow-2xs"
+                  : "text-stone-500 hover:text-stone-800"
+              }`}
+            >
+              {p === "today" ? "Today" : p === "this_week" ? "This Week" : p === "this_month" ? "This Month" : "All"}
+            </button>
+          );
+        })}
       </div>
 
       {/* ── Total Expense Metric Card ── */}
@@ -260,13 +301,14 @@ export function ExpenseList({ expenses }: { expenses: ExpenseRow[] }) {
       >
         <div>
           <p className="text-[10px] font-extrabold uppercase tracking-wider text-red-600 mb-1">
-            {periodLabels[period]}
+            {periodLabel}
           </p>
           <p className="text-3xl font-black tracking-tight text-red-600">
             ₦{totalFilteredAmount.toLocaleString("en-US")}
           </p>
           <p className="text-xs mt-1 text-stone-500 font-medium">
             {filtered.length} transaction{filtered.length !== 1 ? "s" : ""} {categoryFilter !== "All" ? `in ${categoryFilter}` : ""}
+            {searchQuery ? ` matching "${searchQuery}"` : ""}
           </p>
         </div>
         <div className="w-10 h-10 rounded-2xl bg-red-50 flex items-center justify-center flex-shrink-0 text-red-600">
@@ -310,7 +352,9 @@ export function ExpenseList({ expenses }: { expenses: ExpenseRow[] }) {
               No expenses recorded
             </p>
             <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>
-              {categoryFilter === "All"
+              {searchQuery
+                ? `No expenses found matching "${searchQuery}".`
+                : categoryFilter === "All"
                 ? "No expenses logged for this selected period."
                 : `No ${categoryFilter.toLowerCase()} expenses found for this period.`}
             </p>

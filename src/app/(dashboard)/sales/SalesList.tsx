@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { voidSale } from "@/app/actions/sales";
+import { SearchMonthToolbar } from "@/components/ui/SearchMonthToolbar";
 
 export type SaleRow = {
   id: string;
@@ -36,6 +37,15 @@ function formatDate(iso: string) {
     hour: "numeric",
     minute: "2-digit",
   });
+}
+
+function getLagosCurrentYM(): string {
+  const formatter = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Africa/Lagos",
+    year: "numeric",
+    month: "2-digit",
+  });
+  return formatter.format(new Date()); // YYYY-MM
 }
 
 function isTodayInLagos(isoDate: string): boolean {
@@ -76,6 +86,7 @@ function PaymentBadge({ method, bankName }: { method: string; bankName?: string 
 export function SalesList({ sales }: { sales: SaleRow[] }) {
   const router = useRouter();
   const [query, setQuery] = useState("");
+  const [selectedMonth, setSelectedMonth] = useState<string | null>(getLagosCurrentYM());
   const [paymentFilter, setPaymentFilter] = useState<"all" | "cash" | "transfer" | "credit">("all");
   const [confirmSale, setConfirmSale] = useState<SaleRow | null>(null);
   const [voiding, setVoiding] = useState(false);
@@ -98,15 +109,24 @@ export function SalesList({ sales }: { sales: SaleRow[] }) {
   const totalTransferFunds = transferSales.reduce((sum, s) => sum + s.total_amount, 0);
 
   const filtered = sales.filter((s) => {
+    // Payment filter
     if (paymentFilter !== "all" && s.payment_method !== paymentFilter) return false;
 
+    // Month filter
+    if (selectedMonth !== null) {
+      if (!s.created_at.startsWith(selectedMonth)) return false;
+    }
+
+    // Search query filter
     const term = query.toLowerCase();
     if (!term) return true;
 
     const itemMatch = s.sale_items.some((i) => i.products?.name.toLowerCase().includes(term));
     const custMatch = s.credit_sales?.some((c) => c.customers?.name.toLowerCase().includes(term));
     const bankMatch = s.bank_name?.toLowerCase().includes(term);
-    return itemMatch || custMatch || bankMatch;
+    const noteMatch = s.notes?.toLowerCase().includes(term);
+    const amtMatch = String(s.total_amount).includes(term);
+    return itemMatch || custMatch || bankMatch || noteMatch || amtMatch;
   });
 
   async function handleConfirmVoid() {
@@ -136,17 +156,17 @@ export function SalesList({ sales }: { sales: SaleRow[] }) {
       {/* ── Page Header ── */}
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
+          <h1 className="text-xl font-bold" style={{ color: "var(--text-primary)" }}>
             Sales History
           </h1>
-          <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>
-            {sales.length} transaction{sales.length !== 1 ? "s" : ""} recorded
+          <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+            {filtered.length} transaction{filtered.length !== 1 ? "s" : ""} shown
           </p>
         </div>
         <Link
           href="/sales/new"
           id="record-sale-btn"
-          className="flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold text-white transition-all active:scale-[0.97] shadow-sm flex-shrink-0"
+          className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-2xl text-xs font-bold text-white transition-all active:scale-[0.97] shadow-sm flex-shrink-0"
           style={{ background: "var(--accent)" }}
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} className="w-4 h-4">
@@ -211,313 +231,97 @@ export function SalesList({ sales }: { sales: SaleRow[] }) {
         </div>
       </div>
 
-      {/* ── Search & Filter Controls ── */}
-      <div className="space-y-3">
-        {/* Search Bar */}
-        <div className="relative">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={1.8}
-            className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"
-            style={{ color: "var(--text-muted)" }}
-          >
-            <circle cx="11" cy="11" r="8" />
-            <line x1="21" y1="21" x2="16.65" y2="16.65" />
-          </svg>
-          <input
-            type="text"
-            placeholder="Search by product, customer, or bank name..."
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            className="w-full rounded-2xl border pl-10 pr-4 py-2.5 text-xs focus:outline-none transition-colors bg-white"
-            style={{
-              borderColor: "var(--border-color)",
-              color: "var(--text-primary)",
-            }}
-            onFocus={(e) => (e.target.style.borderColor = "var(--accent)")}
-            onBlur={(e) => (e.target.style.borderColor = "var(--border-color)")}
-          />
-        </div>
+      {/* ── Search Bar + Month Filter Toolbar ── */}
+      <SearchMonthToolbar
+        searchQuery={query}
+        onSearchChange={setQuery}
+        selectedMonth={selectedMonth}
+        onMonthChange={setSelectedMonth}
+        placeholder="Search sales by product, customer, or bank name..."
+      />
 
-        {/* Swipable & Mobile-Friendly Payment Filter Chips */}
+      {/* ── Payment Filter Chips ── */}
+      <div className="space-y-3">
         <div
           className="p-1 rounded-2xl flex items-center gap-1.5 border bg-white overflow-x-auto no-scrollbar"
           style={{ borderColor: "var(--border-color)" }}
         >
           {(
             [
-              { id: "all", label: "All Sales", count: sales.length },
-              { id: "cash", label: "Cash", count: sales.filter((s) => s.payment_method === "cash").length },
-              { id: "transfer", label: "Transfer", count: sales.filter((s) => s.payment_method === "transfer").length },
-              { id: "credit", label: "Credit", count: sales.filter((s) => s.payment_method === "credit").length },
+              { id: "all", label: "All Sales" },
+              { id: "cash", label: "Cash" },
+              { id: "transfer", label: "Transfer" },
+              { id: "credit", label: "Credit" },
             ] as const
           ).map((tab) => {
-            const active = paymentFilter === tab.id;
+            const isSelected = paymentFilter === tab.id;
             return (
               <button
                 key={tab.id}
                 type="button"
                 onClick={() => setPaymentFilter(tab.id)}
-                className={`flex-1 min-w-[90px] flex-shrink-0 py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 whitespace-nowrap ${
-                  active ? "shadow-xs" : ""
+                className={`flex-1 py-1.5 px-3 rounded-xl text-xs font-bold transition-all whitespace-nowrap text-center ${
+                  isSelected
+                    ? "bg-stone-900 text-white shadow-2xs"
+                    : "text-stone-500 hover:text-stone-900 hover:bg-stone-50"
                 }`}
-                style={{
-                  background: active ? "var(--accent)" : "transparent",
-                  color: active ? "#ffffff" : "var(--text-muted)",
-                }}
               >
-                <span>{tab.label}</span>
-                <span
-                  className="px-1.5 py-0.2 rounded-full text-[10px]"
-                  style={{
-                    background: active ? "rgba(255,255,255,0.25)" : "var(--icon-neutral-bg)",
-                    color: active ? "#ffffff" : "var(--text-muted)",
-                  }}
-                >
-                  {tab.count}
-                </span>
+                {tab.label}
               </button>
             );
           })}
         </div>
+
+        {/* Bank Account Funds Breakdown Card */}
+        {paymentFilter === "transfer" && bankEntries.length > 0 && (
+          <div
+            className="p-4 rounded-2xl border bg-blue-50/50 space-y-2"
+            style={{ borderColor: "rgba(59,130,246,0.2)" }}
+          >
+            <div className="flex justify-between items-center">
+              <p className="text-xs font-extrabold uppercase tracking-wider text-blue-900">
+                Bank Accounts & Funds
+              </p>
+              <span className="text-[11px] font-bold text-blue-700">
+                Total: {formatNaira(totalTransferFunds)}
+              </span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+              {bankEntries.map(([bank, total]) => (
+                <div
+                  key={bank}
+                  className="flex justify-between items-center p-2.5 bg-white rounded-xl border border-blue-100 text-xs shadow-2xs"
+                >
+                  <span className="font-medium text-stone-700 truncate pr-2">
+                    🏦 {bank}
+                  </span>
+                  <span className="font-bold text-blue-700 flex-shrink-0">
+                    {formatNaira(total)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* ── Bank Accounts Funds Breakdown Section (Positioned UNDER Sales Type Tabs) ── */}
-      {(paymentFilter === "transfer" || (paymentFilter === "all" && bankEntries.length > 0)) && (
-        <div
-          className="rounded-2xl border p-4 bg-white space-y-3.5 transition-all"
-          style={{ borderColor: "var(--border-color)", boxShadow: "var(--card-shadow)" }}
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div
-                className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-                style={{ background: "rgba(59,130,246,0.1)", color: "#2563eb" }}
-              >
-                <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-                  <path fillRule="evenodd" d="M11.47 2.47a.75.75 0 011.06 0l7.5 7.5a.75.75 0 11-1.06 1.06l-6.97-6.97L5.03 11.03a.75.75 0 01-1.06-1.06l7.5-7.5z" clipRule="evenodd" />
-                  <path fillRule="evenodd" d="M12 5.25a.75.75 0 01.75.75v14.25a.75.75 0 01-1.5 0V6a.75.75 0 01.75-.75z" clipRule="evenodd" />
-                  <path d="M3 19.5a.75.75 0 01.75-.75h16.5a.75.75 0 010 1.5H3.75A.75.75 0 013 19.5z" />
-                </svg>
-              </div>
-              <div>
-                <h2 className="text-xs font-bold uppercase tracking-wider" style={{ color: "var(--text-primary)" }}>
-                  Bank Accounts & Funds
-                </h2>
-                <p className="text-[11px]" style={{ color: "var(--text-muted)" }}>
-                  Total transfer funds received per bank
-                </p>
-              </div>
-            </div>
-            <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full border border-blue-100">
-              {formatNaira(totalTransferFunds)}
-            </span>
-          </div>
-
-          {bankEntries.length === 0 ? (
-            <p className="text-xs text-stone-500 py-1">No bank transfers recorded yet.</p>
-          ) : (
-            <div className="space-y-3 pt-1">
-              {bankEntries.map(([bank, amount]) => {
-                const pct = totalTransferFunds > 0 ? Math.round((amount / totalTransferFunds) * 100) : 0;
-                return (
-                  <div key={bank} className="space-y-1.5">
-                    <div className="flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-2">
-                        <div
-                          className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0"
-                          style={{ background: "var(--icon-neutral-bg)", color: "var(--icon-neutral-text)" }}
-                        >
-                          <svg viewBox="0 0 24 24" fill="currentColor" className="w-3 h-3">
-                            <path d="M11.584 2.25a.75.75 0 01.832 0l9 6a.75.75 0 010 1.252l-9 6a.75.75 0 01-.832 0l-9-6a.75.75 0 010-1.252l9-6z" />
-                          </svg>
-                        </div>
-                        <span className="font-bold" style={{ color: "var(--text-primary)" }}>
-                          {bank}
-                        </span>
-                      </div>
-                      <div className="text-right">
-                        <span className="font-bold" style={{ color: "var(--accent)" }}>
-                          {formatNaira(amount)}
-                        </span>
-                        <span className="text-[10px] text-stone-400 ml-1.5 font-medium">({pct}%)</span>
-                      </div>
-                    </div>
-                    {/* Progress Bar */}
-                    <div className="w-full h-1.5 rounded-full bg-stone-100 overflow-hidden">
-                      <div
-                        className="h-full rounded-full transition-all duration-300"
-                        style={{ width: `${pct}%`, background: "var(--accent)" }}
-                      />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* ── Sales List ── */}
-      {filtered.length === 0 ? (
-        <div
-          className="rounded-2xl border p-10 text-center bg-white space-y-3"
-          style={{ borderColor: "var(--border-color)" }}
-        >
-          <div
-            className="w-12 h-12 rounded-full flex items-center justify-center mx-auto"
-            style={{ background: "var(--icon-neutral-bg)", color: "var(--icon-neutral-text)" }}
-          >
-            <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
-              <path d="M2.25 4.5c0-.83.67-1.5 1.5-1.5h16.5c.83 0 1.5.67 1.5 1.5v15c0 .83-.67 1.5-1.5 1.5H3.75c-.83 0-1.5-.67-1.5-1.5v-15zM3.75 6v3h16.5V6H3.75zm16.5 6H3.75v7.5h16.5V12z" />
-            </svg>
-          </div>
-          <div>
-            <p className="font-bold text-sm" style={{ color: "var(--text-primary)" }}>
-              {sales.length === 0 ? "No sales recorded yet" : "No sales match your filter"}
-            </p>
-            <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>
-              {sales.length === 0
-                ? "Record transactions to keep track of daily revenue and bank transfers."
-                : "Try selecting another payment filter or clearing your search term."}
-            </p>
-          </div>
-          {sales.length === 0 && (
-            <Link
-              href="/sales/new"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-white shadow-sm"
-              style={{ background: "var(--accent)" }}
-            >
-              + Record Your First Sale
-            </Link>
-          )}
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {filtered.map((sale) => {
-            const customerName = sale.credit_sales?.[0]?.customers?.name;
-            const isVoided = sale.status === "voided" || Boolean(sale.notes?.startsWith("[VOIDED]"));
-            const canVoid = !isVoided && isTodayInLagos(sale.created_at);
-            const cleanNotes = sale.notes ? sale.notes.replace(/^\[VOIDED\]\s*/, "").trim() : "";
-
-            return (
-              <div
-                key={sale.id}
-                className={`rounded-2xl border bg-white p-4 transition-all ${
-                  isVoided ? "opacity-60 bg-stone-50" : ""
-                }`}
-                style={{ borderColor: "var(--border-color)", boxShadow: "var(--card-shadow)" }}
-              >
-                <div className="flex items-start justify-between gap-3 mb-2.5">
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <p
-                        className={`font-bold text-base ${isVoided ? "line-through text-stone-400" : ""}`}
-                        style={{ color: isVoided ? undefined : "var(--text-primary)" }}
-                      >
-                        {formatNaira(sale.total_amount)}
-                      </p>
-                      {isVoided && (
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-100 text-red-700 border border-red-200 uppercase">
-                          VOIDED
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-[11px] mt-0.5" style={{ color: "var(--text-muted)" }}>
-                      {formatDate(sale.created_at)}
-                    </p>
-                  </div>
-
-                  <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
-                    <div className="flex items-center gap-1.5">
-                      <PaymentBadge method={sale.payment_method} bankName={sale.bank_name} />
-
-                      {canVoid && (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setErrorMsg("");
-                            setConfirmSale(sale);
-                          }}
-                          className="text-[10px] font-bold px-2 py-0.5 rounded-full border border-red-200 text-red-600 hover:bg-red-50 active:scale-[0.97] transition-all"
-                          title="Void this sale and return items to inventory"
-                        >
-                          Void
-                        </button>
-                      )}
-                    </div>
-                    {customerName && (
-                      <span className="text-[11px] font-semibold flex items-center gap-1 text-stone-700">
-                        <svg viewBox="0 0 24 24" fill="currentColor" className="w-3 h-3 text-stone-400">
-                          <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                        </svg>
-                        {customerName}
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                <div className="pt-2.5 border-t space-y-1" style={{ borderColor: "var(--border-color)" }}>
-                  <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
-                    Items Sold
-                  </p>
-                  <ul className="space-y-1">
-                    {sale.sale_items.map((item, idx) => (
-                      <li
-                        key={idx}
-                        className={`text-xs flex justify-between font-medium ${isVoided ? "line-through" : ""}`}
-                        style={{ color: "var(--text-primary)" }}
-                      >
-                        <span className="truncate pr-2">
-                          {item.quantity}x {item.products?.name || "Item"}
-                        </span>
-                        <span className="font-bold flex-shrink-0" style={{ color: "var(--text-muted)" }}>
-                          {formatNaira(item.unit_price * item.quantity)}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                  {cleanNotes && (
-                    <p className="text-[11px] pt-1 italic" style={{ color: "var(--text-muted)" }}>
-                      Note: {cleanNotes}
-                    </p>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {/* ── Void Confirmation Modal ── */}
+      {/* ── Void Sale Confirmation Modal ── */}
       {confirmSale && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
-          <div
-            className="bg-white rounded-2xl max-w-sm w-full p-5 border shadow-xl space-y-4"
-            style={{ borderColor: "var(--border-color)" }}
-          >
+          <div className="bg-white rounded-2xl max-w-sm w-full p-5 border shadow-xl space-y-4" style={{ borderColor: "var(--border-color)" }}>
             <div className="w-10 h-10 rounded-full bg-red-50 text-red-600 flex items-center justify-center">
               <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-                <path fillRule="evenodd" d="M9.401 3.003c1.154-1.999 4.043-1.999 5.197 0l7.355 12.748c1.154 2-298 4.5-1.044 4.5H3.09c-2.342 0-3.8-2.5-2.646-4.5L9.401 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z" clipRule="evenodd" />
+                <path fillRule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z" clipRule="evenodd" />
               </svg>
             </div>
 
             <div>
               <h3 className="font-bold text-base" style={{ color: "var(--text-primary)" }}>
-                Void this sale?
+                Void Sale #{confirmSale.id.slice(0, 8)}?
               </h3>
-              <p className="text-xs mt-1.5" style={{ color: "var(--text-muted)" }}>
-                This will reverse the transaction of <strong>{formatNaira(confirmSale.total_amount)}</strong>:
+              <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>
+                Voiding this {formatNaira(confirmSale.total_amount)} sale will restock all included inventory items and mark the sale as canceled.
               </p>
-              <ul className="text-xs mt-2 space-y-1 list-disc list-inside text-stone-600 font-medium">
-                <li>Items sold will be restored back to inventory stock.</li>
-                {confirmSale.payment_method === "credit" && (
-                  <li>Any customer debt from this credit sale will be removed.</li>
-                )}
-                <li>The transaction will be marked as VOIDED.</li>
-              </ul>
             </div>
 
             {errorMsg && (
@@ -546,6 +350,106 @@ export function SalesList({ sales }: { sales: SaleRow[] }) {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* ── Sales List ── */}
+      {filtered.length === 0 ? (
+        <div
+          className="rounded-2xl border p-10 text-center bg-white space-y-3"
+          style={{ borderColor: "var(--border-color)", boxShadow: "var(--card-shadow)" }}
+        >
+          <div className="w-12 h-12 rounded-full bg-stone-100 text-stone-400 flex items-center justify-center mx-auto">
+            <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+              <path fillRule="evenodd" d="M2.25 4.5c0-.83.67-1.5 1.5-1.5h16.5c.83 0 1.5.67 1.5 1.5v15c0 .83-.67 1.5-1.5 1.5H3.75c-.83 0-1.5-.67-1.5-1.5v-15zM3.75 6v3h16.5V6H3.75zm16.5 6H3.75v7.5h16.5V12z" clipRule="evenodd" />
+            </svg>
+          </div>
+          <div>
+            <p className="font-bold text-sm" style={{ color: "var(--text-primary)" }}>
+              No sales transactions found
+            </p>
+            <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>
+              {query ? `No sales match "${query}"` : "Try selecting a different filter or month."}
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {filtered.map((sale) => {
+            const isVoided = sale.status === "voided" || sale.notes?.startsWith("[VOIDED]");
+            const customerObj = (Array.isArray(sale.credit_sales) ? sale.credit_sales[0] : sale.credit_sales) as {
+              customers?: { name: string; phone?: string | null } | null;
+            } | undefined | null;
+            const customerName = customerObj?.customers?.name;
+
+            return (
+              <div
+                key={sale.id}
+                className={`rounded-2xl border p-4 transition-all bg-white ${
+                  isVoided ? "opacity-60 bg-stone-50 border-stone-200" : ""
+                }`}
+                style={{
+                  borderColor: isVoided ? "var(--border-color)" : "var(--border-color)",
+                  boxShadow: isVoided ? "none" : "var(--card-shadow)",
+                }}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <PaymentBadge method={sale.payment_method} bankName={sale.bank_name} />
+                      <span className="text-[11px] font-medium" style={{ color: "var(--text-muted)" }}>
+                        {formatDate(sale.created_at)}
+                      </span>
+                      {isVoided && (
+                        <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-red-100 text-red-700">
+                          VOIDED
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Customer Name if Credit Sale */}
+                    {customerName && (
+                      <p className="text-xs font-bold text-stone-800 mt-1 flex items-center gap-1">
+                        <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5 text-stone-400">
+                          <path fillRule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.6-7.812-1.7a.75.75 0 01-.437-.695z" clipRule="evenodd" />
+                        </svg>
+                        <span>Customer: {customerName}</span>
+                      </p>
+                    )}
+
+                    {/* Sale Items List */}
+                    <div className="mt-2 space-y-1">
+                      {sale.sale_items?.map((item, idx) => (
+                        <p key={idx} className="text-xs font-medium text-stone-700 truncate">
+                          {item.quantity}x {item.products?.name || "Product Item"}
+                        </p>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="text-right flex-shrink-0 space-y-2">
+                    <p
+                      className={`text-base font-black ${
+                        isVoided ? "line-through text-stone-400" : "text-stone-900"
+                      }`}
+                    >
+                      {formatNaira(sale.total_amount)}
+                    </p>
+
+                    {!isVoided && (
+                      <button
+                        type="button"
+                        onClick={() => setConfirmSale(sale)}
+                        className="text-[11px] font-bold text-red-600 hover:text-red-800 underline decoration-red-200 transition-colors"
+                      >
+                        Void Sale
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>
