@@ -67,7 +67,7 @@ export function SearchMonthToolbar({
 
   return (
     <div className="w-full">
-      {/* ── Mobile Expanded Search Mode (Shown when mobile search icon is tapped) ── */}
+      {/* ── Mobile Expanded Search Mode ── */}
       {mobileSearchOpen ? (
         <div className="flex sm:hidden items-center gap-2 w-full animate-in fade-in duration-150">
           <div className="relative flex-1">
@@ -111,13 +111,13 @@ export function SearchMonthToolbar({
           </button>
         </div>
       ) : (
-        /* ── Standard Mode (Mobile Compact Row / Desktop Full Row) ── */
+        /* ── Standard Mode: Search + Compact Month Stepper ── */
         <div className="flex items-center justify-between gap-2 w-full">
-          {/* Mobile Search Button (Compact 36px icon pill) */}
+          {/* Mobile Search Button Pill */}
           <button
             type="button"
             onClick={() => setMobileSearchOpen(true)}
-            className="flex sm:hidden items-center gap-1.5 px-3 py-2 rounded-2xl border bg-white text-xs font-bold transition-all shadow-2xs relative flex-shrink-0"
+            className="flex sm:hidden items-center gap-1.5 px-3 py-1.5 rounded-2xl border bg-white text-xs font-bold transition-all shadow-2xs relative flex-shrink-0"
             style={{
               borderColor: searchQuery ? "var(--accent-border)" : "var(--border-color)",
               color: searchQuery ? "var(--accent)" : "var(--text-muted)",
@@ -125,19 +125,19 @@ export function SearchMonthToolbar({
             }}
             title="Search records"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} className="w-4 h-4">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} className="w-3.5 h-3.5">
               <circle cx="11" cy="11" r="8" />
               <line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
-            <span className="truncate max-w-[80px]">
+            <span className="truncate max-w-[70px]">
               {searchQuery ? searchQuery : "Search"}
             </span>
             {searchQuery && (
-              <span className="w-2 h-2 rounded-full bg-amber-500 flex-shrink-0" />
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 flex-shrink-0" />
             )}
           </button>
 
-          {/* Desktop Search Input Box (Hidden on mobile when collapsed) */}
+          {/* Desktop Search Input Box */}
           <div className="hidden sm:block relative flex-1">
             <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} className="w-4 h-4">
@@ -150,7 +150,7 @@ export function SearchMonthToolbar({
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
               placeholder={placeholder}
-              className="w-full rounded-2xl border pl-10 pr-9 py-2.5 text-xs font-medium focus:outline-none transition-colors"
+              className="w-full rounded-2xl border pl-10 pr-9 py-2 text-xs font-medium focus:outline-none transition-colors"
               style={{
                 background: "var(--bg-surface)",
                 borderColor: "var(--border-color)",
@@ -168,22 +168,22 @@ export function SearchMonthToolbar({
             )}
           </div>
 
-          {/* Month Selector Widget — Unbroken & Always Visible */}
+          {/* Compact Month Stepper (No icon artifact, tight padding) */}
           <div className="flex items-center gap-1 flex-shrink-0">
             {/* Previous Month Arrow */}
             <button
               type="button"
               onClick={handlePrevMonth}
-              className="w-9 h-9 rounded-2xl border bg-white flex items-center justify-center transition-colors hover:bg-stone-50 active:scale-95 shadow-2xs"
+              className="w-8 h-8 rounded-full border bg-white flex items-center justify-center transition-colors hover:bg-stone-50 active:scale-95 shadow-2xs"
               style={{ borderColor: "var(--border-color)", color: "var(--text-muted)" }}
               title="Previous month"
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} className="w-3.5 h-3.5">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} className="w-3.5 h-3.5">
                 <polyline points="15 18 9 12 15 6" />
               </svg>
             </button>
 
-            {/* Month Label / All Toggle Pill */}
+            {/* Month Label Pill — Clean, Compact, No Icons */}
             <button
               type="button"
               onClick={() => {
@@ -193,7 +193,7 @@ export function SearchMonthToolbar({
                   onMonthChange(null);
                 }
               }}
-              className="px-3 py-2 rounded-2xl border font-bold text-xs transition-colors flex items-center gap-1.5 shadow-2xs select-none"
+              className="px-3 py-1.5 rounded-full border font-extrabold text-xs transition-colors shadow-2xs select-none truncate text-center"
               style={{
                 background: isAll ? "var(--bg-surface)" : "var(--accent-dim)",
                 borderColor: isAll ? "var(--border-color)" : "var(--accent-border)",
@@ -201,10 +201,7 @@ export function SearchMonthToolbar({
               }}
               title={isAll ? "Switch to month filter" : "Show all time"}
             >
-              <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5 opacity-80">
-                <path fillRule="evenodd" d="M6.75 2.25A.75.75 0 017.5 3v1.5h9V3a.75.75 0 011.5 0v1.5h.75d0a3 3 0 013 3v11.25a3 3 0 01-3 3H5.25a3 3 0 01-3-3V7.5a3 3 0 013-3h.75V3a.75.75 0 01.75-.75zM3.75 9v9.75a1.5 1.5 0 001.5 1.5h13.5a1.5 1.5 0 001.5-1.5V9H3.75z" clipRule="evenodd" />
-              </svg>
-              <span>{isAll ? "All Time" : getMonthLabel(activeYM)}</span>
+              {isAll ? "All Time" : getMonthLabel(activeYM)}
             </button>
 
             {/* Next Month Arrow */}
@@ -212,11 +209,11 @@ export function SearchMonthToolbar({
               type="button"
               onClick={handleNextMonth}
               disabled={isCurrentMonth || isAll}
-              className="w-9 h-9 rounded-2xl border bg-white flex items-center justify-center transition-colors hover:bg-stone-50 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed shadow-2xs"
+              className="w-8 h-8 rounded-full border bg-white flex items-center justify-center transition-colors hover:bg-stone-50 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed shadow-2xs"
               style={{ borderColor: "var(--border-color)", color: "var(--text-muted)" }}
               title="Next month"
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} className="w-3.5 h-3.5">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} className="w-3.5 h-3.5">
                 <polyline points="9 18 15 12 9 6" />
               </svg>
             </button>
