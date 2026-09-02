@@ -37,7 +37,7 @@ function isDateInPeriod(dateStr: string, period: DatePeriod): boolean {
 
   if (period === "this_week") {
     const today = new Date(todayISO);
-    const dayOfWeek = today.getDay(); // 0 is Sunday, 1 is Monday...
+    const dayOfWeek = today.getDay();
     const distanceToMonday = (dayOfWeek + 6) % 7;
     const monday = new Date(today);
     monday.setDate(today.getDate() - distanceToMonday);
@@ -49,6 +49,54 @@ function isDateInPeriod(dateStr: string, period: DatePeriod): boolean {
   }
 
   return true;
+}
+
+// Category Icons
+function CategoryIcon({ category }: { category: string }) {
+  switch (category.toLowerCase()) {
+    case "rent":
+      return (
+        <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-purple-600">
+          <path fillRule="evenodd" d="M4.5 2.25a.75.75 0 00-.75.75v18a.75.75 0 001.5 0V18h15v3a.75.75 0 001.5 0V3a.75.75 0 00-.75-.75h-16.5zM6 4.5h3v3H6v-3zm0 4.5h3v3H6V9zm0 4.5h3v3H6v-3zm6-9h3v3h-3v-3zm0 4.5h3v3h-3V9zm0 4.5h3v3h-3v-3z" clipRule="evenodd" />
+        </svg>
+      );
+    case "stock":
+      return (
+        <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-blue-600">
+          <path d="M3.375 3C2.339 3 1.5 3.84 1.5 4.875v.75c0 1.036.84 1.875 1.875 1.875h17.25c1.035 0 1.875-.84 1.875-1.875v-.75C22.5 3.839 21.66 3 20.625 3H3.375z" />
+          <path fillRule="evenodd" d="M3.087 9l.54 9.176A3 3 0 006.62 21h10.757a3 3 0 002.995-2.824L20.913 9H3.087zm6.163 3.75A.75.75 0 0110 12h4a.75.75 0 010 1.5h-4a.75.75 0 01-.75-.75z" clipRule="evenodd" />
+        </svg>
+      );
+    case "transport":
+      return (
+        <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-amber-600">
+          <path d="M3.375 4.5C2.339 4.5 1.5 5.34 1.5 6.375V13.5h12V6.375c0-1.036-.84-1.875-1.875-1.875H3.375zM15 6.375c0-1.036.84-1.875 1.875-1.875h.586c.995 0 1.95.395 2.653 1.098l.94.94A3.75 3.75 0 0122.152 9.19l.348 2.087A3.75 3.75 0 0122.5 12v1.5h-7.5V6.375z" />
+          <path fillRule="evenodd" d="M3.75 15a2.25 2.25 0 104.5 0 2.25 2.25 0 00-4.5 0zm12 0a2.25 2.25 0 104.5 0 2.25 2.25 0 00-4.5 0z" clipRule="evenodd" />
+        </svg>
+      );
+    case "salary":
+      return (
+        <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-emerald-600">
+          <path fillRule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.6-7.812-1.7a.75.75 0 01-.437-.695z" clipRule="evenodd" />
+        </svg>
+      );
+    default:
+      return (
+        <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-stone-600">
+          <path fillRule="evenodd" d="M5.625 1.5c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V12.75A3.75 3.75 0 0016.5 9h-1.875a.375.375 0 01-.375-.375V6.75A3.75 3.75 0 0010.5 3H5.625z" clipRule="evenodd" />
+        </svg>
+      );
+  }
+}
+
+function CategoryBgColor(category: string): string {
+  switch (category.toLowerCase()) {
+    case "rent": return "bg-purple-50";
+    case "stock": return "bg-blue-50";
+    case "transport": return "bg-amber-50";
+    case "salary": return "bg-emerald-50";
+    default: return "bg-stone-100";
+  }
 }
 
 export function ExpenseList({ expenses }: { expenses: ExpenseRow[] }) {
@@ -65,8 +113,10 @@ export function ExpenseList({ expenses }: { expenses: ExpenseRow[] }) {
   const [savingEdit, setSavingEdit] = useState(false);
   const [editError, setEditError] = useState("");
 
-  // Delete State
-  const [deletingId, setDeletingId] = useState<string | null>(null);
+  // Delete Confirmation Modal State (replaces native confirm/alert)
+  const [deleteConfirmExpense, setDeleteConfirmExpense] = useState<ExpenseRow | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
 
   const categories = ["All", "Rent", "Stock", "Transport", "Salary", "Other"];
   const editCategories = ["Rent", "Stock", "Transport", "Salary", "Other"];
@@ -130,23 +180,23 @@ export function ExpenseList({ expenses }: { expenses: ExpenseRow[] }) {
     }
   }
 
-  async function handleDeleteExpense(id: string) {
-    if (!confirm("Are you sure you want to delete this expense record?")) {
-      return;
-    }
+  async function handleConfirmDelete() {
+    if (!deleteConfirmExpense) return;
+    setDeleting(true);
+    setDeleteError("");
 
-    setDeletingId(id);
     try {
-      const res = await deleteExpense(id);
-      setDeletingId(null);
+      const res = await deleteExpense(deleteConfirmExpense.id);
+      setDeleting(false);
       if ("error" in res) {
-        alert(res.error);
+        setDeleteError(res.error);
       } else {
+        setDeleteConfirmExpense(null);
         router.refresh();
       }
-    } catch {
-      setDeletingId(null);
-      alert("Failed to delete expense.");
+    } catch (err: unknown) {
+      setDeleting(false);
+      setDeleteError(err instanceof Error ? err.message : "Failed to delete expense.");
     }
   }
 
@@ -158,23 +208,23 @@ export function ExpenseList({ expenses }: { expenses: ExpenseRow[] }) {
   };
 
   return (
-    <div>
+    <div className="space-y-4">
       {/* ── Page Header ── */}
-      <div className="flex items-center justify-between gap-3 mb-5">
+      <div className="flex items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
+          <h1 className="text-xl font-bold" style={{ color: "var(--text-primary)" }}>
             Expenses
           </h1>
-          <p className="text-sm mt-0.5" style={{ color: "var(--text-muted)" }}>
-            Log and track daily costs
+          <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+            Log and track daily shop operational costs
           </p>
         </div>
         <Link
           href="/expenses/new"
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition-all active:scale-[0.97] shadow-sm flex-shrink-0"
+          className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-2xl text-xs font-bold text-white transition-all active:scale-[0.97] shadow-sm flex-shrink-0"
           style={{ background: "var(--accent)" }}
         >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} className="w-4 h-4">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} className="w-4 h-4">
             <line x1="12" y1="5" x2="12" y2="19" />
             <line x1="5" y1="12" x2="19" y2="12" />
           </svg>
@@ -183,13 +233,13 @@ export function ExpenseList({ expenses }: { expenses: ExpenseRow[] }) {
       </div>
 
       {/* ── Period Selector Buttons ── */}
-      <div className="grid grid-cols-4 gap-1.5 p-1 rounded-2xl border bg-stone-100/70 mb-4" style={{ borderColor: "var(--border-color)" }}>
+      <div className="grid grid-cols-4 gap-1 p-1 rounded-2xl border bg-stone-100/70" style={{ borderColor: "var(--border-color)" }}>
         {(["today", "this_week", "this_month", "all"] as DatePeriod[]).map((p) => (
           <button
             key={p}
             type="button"
             onClick={() => setPeriod(p)}
-            className={`py-1.5 rounded-xl text-xs font-bold transition-all ${
+            className={`py-2 rounded-xl text-xs font-bold transition-all ${
               period === p
                 ? "bg-white text-stone-900 shadow-2xs"
                 : "text-stone-500 hover:text-stone-800"
@@ -202,43 +252,39 @@ export function ExpenseList({ expenses }: { expenses: ExpenseRow[] }) {
 
       {/* ── Total Expense Metric Card ── */}
       <div
-        className="rounded-2xl border p-4 mb-5 flex items-center justify-between gap-4 bg-white"
+        className="rounded-2xl border p-4 flex items-center justify-between gap-4 bg-white"
         style={{
-          background: "linear-gradient(135deg, rgba(239,68,68,0.06) 0%, rgba(239,68,68,0.02) 100%)",
-          borderColor: "rgba(239,68,68,0.25)",
+          borderColor: "rgba(220,38,38,0.2)",
+          boxShadow: "var(--card-shadow)",
         }}
       >
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-wider mb-1" style={{ color: "#dc2626" }}>
+          <p className="text-[10px] font-extrabold uppercase tracking-wider text-red-600 mb-1">
             {periodLabels[period]}
           </p>
-          <p className="text-2xl font-black tracking-tight" style={{ color: "#dc2626" }}>
+          <p className="text-3xl font-black tracking-tight text-red-600">
             ₦{totalFilteredAmount.toLocaleString("en-US")}
           </p>
-          <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>
-            {filtered.length} expense{filtered.length !== 1 ? "s" : ""} {categoryFilter !== "All" ? `in ${categoryFilter}` : ""}
+          <p className="text-xs mt-1 text-stone-500 font-medium">
+            {filtered.length} transaction{filtered.length !== 1 ? "s" : ""} {categoryFilter !== "All" ? `in ${categoryFilter}` : ""}
           </p>
         </div>
-        <div
-          className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
-          style={{ background: "rgba(239,68,68,0.12)", color: "#dc2626" }}
-        >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5">
-            <line x1="12" y1="1" x2="12" y2="23" />
-            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+        <div className="w-10 h-10 rounded-2xl bg-red-50 flex items-center justify-center flex-shrink-0 text-red-600">
+          <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+            <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm-1.72 6.97a.75.75 0 10-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 101.06 1.06L12 13.06l1.72 1.72a.75.75 0 101.06-1.06L13.06 12l1.72-1.72a.75.75 0 10-1.06-1.06L12 10.94l-1.72-1.72z" clipRule="evenodd" />
           </svg>
         </div>
       </div>
 
       {/* ── Category Filter Pills ── */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-4 no-scrollbar mb-2">
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
         {categories.map((c) => (
           <button
             key={c}
             onClick={() => setCategoryFilter(c)}
             className="flex-shrink-0 px-3.5 py-1.5 rounded-full text-xs font-bold transition-colors border"
             style={{
-              background: categoryFilter === c ? "var(--accent-dim)" : "var(--bg-elevated)",
+              background: categoryFilter === c ? "var(--accent-dim)" : "var(--bg-surface)",
               borderColor: categoryFilter === c ? "var(--accent-border)" : "var(--border-color)",
               color: categoryFilter === c ? "var(--accent)" : "var(--text-dim)",
             }}
@@ -251,44 +297,52 @@ export function ExpenseList({ expenses }: { expenses: ExpenseRow[] }) {
       {/* ── Expense List ── */}
       {filtered.length === 0 ? (
         <div
-          className="rounded-2xl border p-10 text-center bg-white"
-          style={{ borderColor: "var(--border-color)" }}
+          className="rounded-2xl border p-10 text-center bg-white space-y-3"
+          style={{ borderColor: "var(--border-color)", boxShadow: "var(--card-shadow)" }}
         >
-          <p className="text-3xl mb-3">💸</p>
-          <p className="font-semibold mb-1" style={{ color: "var(--text-primary)" }}>
-            No expenses found
-          </p>
-          <p className="text-sm mb-4" style={{ color: "var(--text-muted)" }}>
-            {categoryFilter === "All"
-              ? "No expenses logged for this selected period."
-              : `No ${categoryFilter.toLowerCase()} expenses found for this period.`}
-          </p>
+          <div className="w-12 h-12 rounded-full bg-stone-100 text-stone-400 flex items-center justify-center mx-auto">
+            <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+              <path fillRule="evenodd" d="M5.625 1.5c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V12.75A3.75 3.75 0 0016.5 9h-1.875a.375.375 0 01-.375-.375V6.75A3.75 3.75 0 0010.5 3H5.625z" clipRule="evenodd" />
+            </svg>
+          </div>
+          <div>
+            <p className="font-bold text-sm" style={{ color: "var(--text-primary)" }}>
+              No expenses recorded
+            </p>
+            <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>
+              {categoryFilter === "All"
+                ? "No expenses logged for this selected period."
+                : `No ${categoryFilter.toLowerCase()} expenses found for this period.`}
+            </p>
+          </div>
           <Link
             href="/expenses/new"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-white shadow-sm"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-2xl text-xs font-bold text-white shadow-sm"
             style={{ background: "var(--accent)" }}
           >
             + Log An Expense
           </Link>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-2.5">
           {filtered.map((e) => (
             <div
               key={e.id}
-              className="rounded-2xl border bg-white p-4 transition-all"
-              style={{ borderColor: "var(--border-color)" }}
+              className="rounded-2xl border bg-white p-3.5 transition-all flex items-center justify-between gap-3"
+              style={{ borderColor: "var(--border-color)", boxShadow: "var(--card-shadow)" }}
             >
-              <div className="flex items-center justify-between">
-                <div className="min-w-0 pr-3">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span
-                      className="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded-md"
-                      style={{ background: "rgba(0,0,0,0.06)", color: "var(--text-dim)" }}
-                    >
+              <div className="flex items-center gap-3 min-w-0">
+                {/* Category Icon Circle */}
+                <div className={`w-9 h-9 rounded-full ${CategoryBgColor(e.category)} flex items-center justify-center flex-shrink-0`}>
+                  <CategoryIcon category={e.category} />
+                </div>
+
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] uppercase font-extrabold px-1.5 py-0.5 rounded bg-stone-100 text-stone-600">
                       {e.category}
                     </span>
-                    <span className="text-xs font-semibold" style={{ color: "var(--text-muted)" }}>
+                    <span className="text-[10px] font-medium text-stone-400">
                       {new Date(e.date).toLocaleDateString("en-NG", {
                         timeZone: "Africa/Lagos",
                         month: "short",
@@ -296,48 +350,96 @@ export function ExpenseList({ expenses }: { expenses: ExpenseRow[] }) {
                       })}
                     </span>
                   </div>
-                  <p className="font-medium text-sm truncate" style={{ color: "var(--text-primary)" }}>
+                  <p className="font-semibold text-xs truncate mt-0.5" style={{ color: "var(--text-primary)" }}>
                     {e.description || "No description"}
                   </p>
                 </div>
+              </div>
 
-                <div className="flex items-center gap-3 flex-shrink-0">
-                  <div className="text-right">
-                    <p className="font-bold text-sm" style={{ color: "#dc2626" }}>
-                      −₦{e.amount.toLocaleString("en-US")}
-                    </p>
-                  </div>
+              <div className="flex items-center gap-3 flex-shrink-0">
+                <p className="font-extrabold text-sm text-red-600">
+                  −₦{e.amount.toLocaleString("en-US")}
+                </p>
 
-                  {/* Actions */}
-                  <div className="flex items-center gap-1">
-                    <button
-                      type="button"
-                      onClick={() => openEditModal(e)}
-                      className="p-1.5 rounded-lg border border-stone-200 text-stone-500 hover:bg-stone-50 transition-colors"
-                      title="Edit Expense"
-                    >
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-3.5 h-3.5">
-                        <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
-                        <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-                      </svg>
-                    </button>
-                    <button
-                      type="button"
-                      disabled={deletingId === e.id}
-                      onClick={() => handleDeleteExpense(e.id)}
-                      className="p-1.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50"
-                      title="Delete Expense"
-                    >
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-3.5 h-3.5">
-                        <polyline points="3 6 5 6 21 6" />
-                        <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
-                      </svg>
-                    </button>
-                  </div>
+                {/* Actions */}
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => openEditModal(e)}
+                    className="p-1.5 rounded-xl border text-stone-500 hover:bg-stone-50 transition-colors"
+                    style={{ borderColor: "var(--border-color)" }}
+                    title="Edit Expense"
+                  >
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5">
+                      <path d="M21.731 2.269a2.625 2.625 0 00-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 000-3.712zM19.513 8.199l-3.712-3.712-12.15 12.15a5.25 5.25 0 00-1.32 2.214l-.8 2.685a.75.75 0 00.933.933l2.685-.8a5.25 5.25 0 002.214-1.32L19.513 8.2z" />
+                    </svg>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDeleteError("");
+                      setDeleteConfirmExpense(e);
+                    }}
+                    className="p-1.5 rounded-xl border text-red-600 border-red-200 hover:bg-red-50 transition-colors"
+                    title="Delete Expense"
+                  >
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5">
+                      <path fillRule="evenodd" d="M16.5 4.478v.227a48.816 48.816 0 013.878.512.75.75 0 11-.256 1.478l-.209-.035-1.005 13.07a3 3 0 01-2.991 2.77H8.084a3 3 0 01-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 01-.256-1.478A48.567 48.567 0 017.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 013.369 0c1.603.051 2.815 1.387 2.815 2.951zm-6.136-1.452a51.196 51.196 0 013.272 0c.967.031 1.71.84 1.71 1.838v.203H8.854v-.203c0-.998.743-1.807 1.71-1.838zM10.5 11.25a.75.75 0 00-1.5 0v6a.75.75 0 001.5 0v-6zm3 0a.75.75 0 00-1.5 0v6a.75.75 0 001.5 0v-6z" clipRule="evenodd" />
+                    </svg>
+                  </button>
                 </div>
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* ── Delete Confirmation Modal ── */}
+      {deleteConfirmExpense && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
+          <div className="bg-white rounded-2xl max-w-sm w-full p-5 border shadow-xl space-y-4" style={{ borderColor: "var(--border-color)" }}>
+            <div className="w-10 h-10 rounded-full bg-red-50 text-red-600 flex items-center justify-center">
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+                <path fillRule="evenodd" d="M16.5 4.478v.227a48.816 48.816 0 013.878.512.75.75 0 11-.256 1.478l-.209-.035-1.005 13.07a3 3 0 01-2.991 2.77H8.084a3 3 0 01-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 01-.256-1.478A48.567 48.567 0 017.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 013.369 0c1.603.051 2.815 1.387 2.815 2.951zm-6.136-1.452a51.196 51.196 0 013.272 0c.967.031 1.71.84 1.71 1.838v.203H8.854v-.203c0-.998.743-1.807 1.71-1.838zM10.5 11.25a.75.75 0 00-1.5 0v6a.75.75 0 001.5 0v-6zm3 0a.75.75 0 00-1.5 0v6a.75.75 0 001.5 0v-6z" clipRule="evenodd" />
+              </svg>
+            </div>
+
+            <div>
+              <h3 className="font-bold text-base" style={{ color: "var(--text-primary)" }}>
+                Delete Expense?
+              </h3>
+              <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>
+                Permanently delete ₦{deleteConfirmExpense.amount.toLocaleString("en-US")} ({deleteConfirmExpense.category})? This action cannot be undone.
+              </p>
+            </div>
+
+            {deleteError && (
+              <div className="text-xs font-semibold p-2.5 rounded-xl bg-red-50 border border-red-200 text-red-600">
+                {deleteError}
+              </div>
+            )}
+
+            <div className="flex gap-2.5 pt-1">
+              <button
+                type="button"
+                disabled={deleting}
+                onClick={() => setDeleteConfirmExpense(null)}
+                className="flex-1 py-2.5 rounded-xl text-xs font-semibold border bg-stone-50 hover:bg-stone-100 transition-colors"
+                style={{ borderColor: "var(--border-color)", color: "var(--text-primary)" }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={deleting}
+                onClick={handleConfirmDelete}
+                className="flex-1 py-2.5 rounded-xl text-xs font-bold text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 transition-colors shadow-sm"
+              >
+                {deleting ? "Deleting..." : "Yes, Delete Expense"}
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
@@ -355,7 +457,7 @@ export function ExpenseList({ expenses }: { expenses: ExpenseRow[] }) {
               <button
                 type="button"
                 onClick={() => setEditingExpense(null)}
-                className="text-stone-400 hover:text-stone-600 text-lg leading-none"
+                className="text-stone-400 hover:text-stone-600 font-bold text-lg leading-none"
               >
                 &times;
               </button>
