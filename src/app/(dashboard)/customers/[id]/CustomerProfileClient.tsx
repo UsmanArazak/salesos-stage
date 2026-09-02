@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { RepaymentModal } from "./RepaymentModal";
 import { deleteCustomer, updateCustomer } from "@/app/actions/customers";
 
@@ -105,13 +106,16 @@ export function CustomerProfileClient({
   const [editLoading, setEditLoading] = useState(false);
   const [editError, setEditError] = useState("");
 
-  // Editable PDF Reminder Template & Payment Details State (Phase 2)
+  // PDF Bank Payment Details (Phase 2 — no reminder text, only bank fields)
   const shopName = shop?.name || "Our Shop";
-  const defaultBank = shop?.bankAccounts && shop.bankAccounts.length > 0 ? shop.bankAccounts[0] : "";
-  const [customReminderText, setCustomReminderText] = useState(
-    `Hello ${customer.name}, this is a friendly debt payment reminder regarding your outstanding balance of ${formatNaira(customer.total_debt)} with ${shopName}. Please review the itemized breakdown below.`
-  );
-  const [customBankDetails, setCustomBankDetails] = useState(defaultBank);
+  const bankList = shop?.bankAccounts || [];
+  const defaultBank = bankList.length > 0 ? bankList[0] : "";
+
+  // Parse bank name and account number from stored string if available
+  // Format typically: "GTBank - 0123456789 (Account Name)" or plain text
+  const [pdfBankName, setPdfBankName] = useState("");
+  const [pdfAccountNumber, setPdfAccountNumber] = useState("");
+  const [pdfAccountName, setPdfAccountName] = useState(defaultBank);
 
   async function handleSaveCustomer(e: React.FormEvent) {
     e.preventDefault();
@@ -159,7 +163,7 @@ export function CustomerProfileClient({
     }
   }
 
-  // Generate Real Downloadable PDF file (Phase 2)
+  // Generate Real Downloadable PDF file
   async function handleDownloadPDF() {
     const element = document.getElementById("pdf-invoice-document");
     if (!element) return;
@@ -179,7 +183,7 @@ export function CustomerProfileClient({
 
       const cleanFileName = `${customer.name.replace(/[^a-zA-Z0-9]/g, "_")}_Debt_Invoice.pdf`;
       const opt = {
-        margin: [10, 10, 10, 10],
+        margin: [12, 12, 12, 12],
         filename: cleanFileName,
         image: { type: "jpeg", quality: 0.98 },
         html2canvas: { scale: 2, useCORS: true, logging: false },
@@ -216,15 +220,17 @@ export function CustomerProfileClient({
 
   const totalCreditAmount = creditHistory.reduce((sum, r) => sum + r.amount, 0);
   const totalRepaidAmount = creditHistory.reduce((sum, r) => sum + r.amount_paid, 0);
-  const bankList = shop?.bankAccounts || [];
+
+  // WhatsApp message — sent separately, not included in PDF
+  const whatsappMessage = `Hello ${customer.name}, this is a friendly debt payment reminder from *${shopName}* regarding your outstanding balance of *${formatNaira(customer.total_debt)}*. Please make payment to settle your account. Thank you!`;
 
   return (
     <div className="max-w-xl mx-auto space-y-5">
       {modalOpen && (
-        <RepaymentModal 
-          customerId={customer.id} 
-          totalDebt={customer.total_debt} 
-          onClose={() => setModalOpen(false)} 
+        <RepaymentModal
+          customerId={customer.id}
+          totalDebt={customer.total_debt}
+          onClose={() => setModalOpen(false)}
         />
       )}
 
@@ -255,7 +261,7 @@ export function CustomerProfileClient({
                   required
                   value={editName}
                   onChange={(e) => setEditName(e.target.value)}
-                  className="w-full rounded-2xl border px-3.5 py-2.5 text-xs focus:outline-none transition-colors"
+                  className="w-full rounded-xl border px-3.5 py-2.5 text-xs focus:outline-none"
                   style={{ background: "var(--bg-surface)", borderColor: "var(--border-color)", color: "var(--text-primary)" }}
                 />
               </div>
@@ -269,7 +275,7 @@ export function CustomerProfileClient({
                   value={editPhone}
                   onChange={(e) => setEditPhone(e.target.value)}
                   placeholder="08012345678"
-                  className="w-full rounded-2xl border px-3.5 py-2.5 text-xs focus:outline-none transition-colors"
+                  className="w-full rounded-xl border px-3.5 py-2.5 text-xs focus:outline-none"
                   style={{ background: "var(--bg-surface)", borderColor: "var(--border-color)", color: "var(--text-primary)" }}
                 />
               </div>
@@ -352,17 +358,19 @@ export function CustomerProfileClient({
         </div>
       )}
 
-      {/* ── Phase 2: PDF Generation & Customization Modal ── */}
+      {/* ── PDF Invoice Generator Modal ── */}
       {statementModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs">
           <div className="bg-white rounded-2xl max-w-xl w-full p-5 border shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto" style={{ borderColor: "var(--border-color)" }}>
+
+            {/* Modal Header */}
             <div className="flex items-center justify-between border-b pb-3" style={{ borderColor: "var(--border-color)" }}>
               <div>
                 <h3 className="font-bold text-base" style={{ color: "var(--text-primary)" }}>
-                  Debt Invoice PDF Generator
+                  Generate Debt Invoice PDF
                 </h3>
-                <p className="text-[11px]" style={{ color: "var(--text-muted)" }}>
-                  Customize payment details and message before downloading
+                <p className="text-[11px] mt-0.5" style={{ color: "var(--text-muted)" }}>
+                  Enter payment details to include in the invoice
                 </p>
               </div>
               <button
@@ -374,148 +382,224 @@ export function CustomerProfileClient({
               </button>
             </div>
 
-            {/* Editable Configuration Controls */}
-            <div className="space-y-3 bg-stone-50 p-3.5 rounded-2xl border border-stone-100 text-xs">
-              <div>
-                <label className="block font-bold text-stone-700 mb-1">
-                  Customize Reminder Message
-                </label>
-                <textarea
-                  rows={2}
-                  value={customReminderText}
-                  onChange={(e) => setCustomReminderText(e.target.value)}
-                  className="w-full rounded-xl border border-stone-200 p-2.5 text-xs text-stone-900 bg-white focus:outline-none focus:border-amber-500"
-                />
-              </div>
+            {/* ── Payment Details Fields (no reminder text) ── */}
+            <div className="space-y-3">
+              <p className="text-[10px] font-extrabold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
+                Repayment Bank Details
+              </p>
 
-              <div>
-                <label className="block font-bold text-stone-700 mb-1">
-                  Payment Bank Account Details
-                </label>
-                {bankList.length > 0 ? (
-                  <select
-                    value={customBankDetails}
-                    onChange={(e) => setCustomBankDetails(e.target.value)}
-                    className="w-full rounded-xl border border-stone-200 p-2.5 text-xs text-stone-900 bg-white focus:outline-none focus:border-amber-500"
-                  >
-                    {bankList.map((b, i) => (
-                      <option key={i} value={b}>
-                        {b}
-                      </option>
-                    ))}
-                    <option value="">Custom Bank Entry...</option>
-                  </select>
-                ) : null}
-
-                {(!customBankDetails || bankList.length === 0) && (
-                  <input
-                    type="text"
-                    value={customBankDetails}
-                    onChange={(e) => setCustomBankDetails(e.target.value)}
-                    placeholder="e.g. GTBank - 0123456789 (SalesOS Shop)"
-                    className="w-full mt-2 rounded-xl border border-stone-200 p-2.5 text-xs text-stone-900 bg-white focus:outline-none focus:border-amber-500"
-                  />
-                )}
-              </div>
-            </div>
-
-            {/* Printable & Downloadable Clean PDF Document (Phase 2: Borderless, Elegant White, No Top SalesOS Logo) */}
-            <div id="pdf-invoice-document" className="bg-white p-6 space-y-6 text-xs text-stone-800">
-              
-              {/* Clean Header: Shop Info ONLY (No SalesOS Logo at header) */}
-              <div className="flex justify-between items-start border-b border-stone-100 pb-4">
+              {/* Quick-select from saved bank accounts */}
+              {bankList.length > 0 && (
                 <div>
-                  <h2 className="font-black text-xl text-stone-900 tracking-tight leading-tight">{shopName}</h2>
-                  {shop?.phone && <p className="text-stone-500 mt-1">Phone: {shop.phone}</p>}
-                  {shop?.address && <p className="text-stone-500">{shop.address}</p>}
-                </div>
-                <div className="text-right">
-                  <span className="font-black text-sm tracking-wider uppercase text-amber-600 block mb-0.5">
-                    DEBT INVOICE
-                  </span>
-                  <p className="text-[11px] text-stone-400">
-                    Date: {new Date().toLocaleDateString("en-NG", { month: "short", day: "numeric", year: "numeric" })}
-                  </p>
-                </div>
-              </div>
-
-              {/* Debtor Details & Reminder Text */}
-              <div className="space-y-1.5 pt-1">
-                <div className="flex justify-between items-baseline">
-                  <p className="text-sm font-bold text-stone-900">Billed To: {customer.name}</p>
-                  {customer.phone && <p className="text-xs text-stone-500">{customer.phone}</p>}
-                </div>
-                <p className="text-xs leading-relaxed text-stone-600 py-2">
-                  {customReminderText}
-                </p>
-              </div>
-
-              {/* Repayment Bank Details */}
-              {customBankDetails && (
-                <div className="py-2.5 px-3.5 bg-stone-50 rounded-xl space-y-1">
-                  <p className="font-bold text-[11px] text-stone-700 uppercase tracking-wider">
-                    Bank Repayment Account:
-                  </p>
-                  <p className="font-semibold text-xs text-stone-900">
-                    {customBankDetails}
-                  </p>
+                  <label className="block text-xs font-semibold mb-1.5" style={{ color: "var(--text-dim)" }}>
+                    Quick-fill from saved accounts
+                  </label>
+                  <select
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val) setPdfAccountName(val);
+                    }}
+                    className="w-full rounded-xl border px-3 py-2.5 text-xs focus:outline-none"
+                    style={{ background: "var(--bg-surface)", borderColor: "var(--border-color)", color: "var(--text-primary)" }}
+                    defaultValue=""
+                  >
+                    <option value="">Select a saved bank account...</option>
+                    {bankList.map((b, i) => (
+                      <option key={i} value={b}>{b}</option>
+                    ))}
+                  </select>
                 </div>
               )}
 
-              {/* Itemized Purchase Table (Borderless & Elegant) */}
-              <div className="pt-2">
-                <p className="font-bold text-xs uppercase tracking-wider text-stone-700 mb-3">Itemized Purchase Statement</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold mb-1.5" style={{ color: "var(--text-dim)" }}>
+                    Bank Name
+                  </label>
+                  <input
+                    type="text"
+                    value={pdfBankName}
+                    onChange={(e) => setPdfBankName(e.target.value)}
+                    placeholder="e.g. GTBank, First Bank"
+                    className="w-full rounded-xl border px-3 py-2.5 text-xs focus:outline-none"
+                    style={{ background: "var(--bg-surface)", borderColor: "var(--border-color)", color: "var(--text-primary)" }}
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold mb-1.5" style={{ color: "var(--text-dim)" }}>
+                    Account Number
+                  </label>
+                  <input
+                    type="text"
+                    value={pdfAccountNumber}
+                    onChange={(e) => setPdfAccountNumber(e.target.value)}
+                    placeholder="e.g. 0123456789"
+                    className="w-full rounded-xl border px-3 py-2.5 text-xs focus:outline-none"
+                    style={{ background: "var(--bg-surface)", borderColor: "var(--border-color)", color: "var(--text-primary)" }}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold mb-1.5" style={{ color: "var(--text-dim)" }}>
+                  Account Name
+                </label>
+                <input
+                  type="text"
+                  value={pdfAccountName}
+                  onChange={(e) => setPdfAccountName(e.target.value)}
+                  placeholder="e.g. Aliyu Enterprises"
+                  className="w-full rounded-xl border px-3 py-2.5 text-xs focus:outline-none"
+                  style={{ background: "var(--bg-surface)", borderColor: "var(--border-color)", color: "var(--text-primary)" }}
+                />
+              </div>
+            </div>
+
+            {/* ── Clean PDF Invoice Preview (Printable / Downloadable) ── */}
+            <div
+              id="pdf-invoice-document"
+              className="bg-white pt-6 pb-2 px-4 text-stone-800"
+              style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
+            >
+              {/* Header: Shop Info only, no logo */}
+              <div className="flex justify-between items-start pb-4" style={{ borderBottom: "1px solid #e7e5e4" }}>
+                <div>
+                  <h2 style={{ fontSize: 18, fontWeight: 900, color: "#1c1917", margin: 0, lineHeight: 1.2 }}>
+                    {shopName}
+                  </h2>
+                  {shop?.phone && (
+                    <p style={{ fontSize: 11, color: "#78716c", marginTop: 3 }}>
+                      Tel: {shop.phone}
+                    </p>
+                  )}
+                  {shop?.address && (
+                    <p style={{ fontSize: 11, color: "#78716c", marginTop: 2 }}>
+                      {shop.address}
+                    </p>
+                  )}
+                </div>
+                <div style={{ textAlign: "right" }}>
+                  <p style={{ fontSize: 13, fontWeight: 800, color: "#f97316", textTransform: "uppercase", letterSpacing: "0.06em", margin: 0 }}>
+                    DEBT INVOICE
+                  </p>
+                  <p style={{ fontSize: 10, color: "#a8a29e", marginTop: 3 }}>
+                    {new Date().toLocaleDateString("en-NG", { day: "numeric", month: "long", year: "numeric" })}
+                  </p>
+                </div>
+              </div>
+
+              {/* Billed To */}
+              <div style={{ marginTop: 18, marginBottom: 16 }}>
+                <p style={{ fontSize: 10, color: "#a8a29e", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", margin: 0 }}>
+                  BILLED TO
+                </p>
+                <p style={{ fontSize: 14, fontWeight: 700, color: "#1c1917", margin: "4px 0 2px" }}>
+                  {customer.name}
+                </p>
+                {customer.phone && (
+                  <p style={{ fontSize: 11, color: "#78716c", margin: 0 }}>
+                    {customer.phone}
+                  </p>
+                )}
+              </div>
+
+              {/* Bank Repayment Details */}
+              {(pdfBankName || pdfAccountNumber || pdfAccountName) && (
+                <div style={{ marginBottom: 20, backgroundColor: "#fafafa", borderRadius: 10, padding: "12px 14px" }}>
+                  <p style={{ fontSize: 10, color: "#a8a29e", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", margin: "0 0 8px" }}>
+                    PAYMENT ACCOUNT
+                  </p>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                    {pdfBankName && (
+                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12 }}>
+                        <span style={{ color: "#78716c" }}>Bank</span>
+                        <span style={{ fontWeight: 700, color: "#1c1917" }}>{pdfBankName}</span>
+                      </div>
+                    )}
+                    {pdfAccountNumber && (
+                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12 }}>
+                        <span style={{ color: "#78716c" }}>Account Number</span>
+                        <span style={{ fontWeight: 700, color: "#1c1917", letterSpacing: "0.05em" }}>{pdfAccountNumber}</span>
+                      </div>
+                    )}
+                    {pdfAccountName && (
+                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12 }}>
+                        <span style={{ color: "#78716c" }}>Account Name</span>
+                        <span style={{ fontWeight: 700, color: "#1c1917" }}>{pdfAccountName}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Itemized Purchase Statement */}
+              <div style={{ marginBottom: 16 }}>
+                <p style={{ fontSize: 10, color: "#a8a29e", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", margin: "0 0 10px" }}>
+                  ITEMIZED PURCHASE STATEMENT
+                </p>
+
+                {/* Table Header */}
+                <div style={{ display: "grid", gridTemplateColumns: "1.2fr 2fr 0.5fr 1fr 1fr", gap: 4, paddingBottom: 6, borderBottom: "1px solid #e7e5e4" }}>
+                  {["Date", "Item", "Qty", "Unit Price", "Total"].map((h) => (
+                    <p key={h} style={{ fontSize: 10, color: "#a8a29e", fontWeight: 600, textTransform: "uppercase", margin: 0 }}>
+                      {h}
+                    </p>
+                  ))}
+                </div>
+
                 {allCreditItems.length === 0 ? (
-                  <p className="text-stone-400 italic py-2">No itemized credit purchases found.</p>
+                  <p style={{ fontSize: 12, color: "#a8a29e", fontStyle: "italic", padding: "12px 0" }}>
+                    No itemized credit purchases found.
+                  </p>
                 ) : (
-                  <table className="w-full text-left border-collapse text-xs">
-                    <thead>
-                      <tr className="border-b border-stone-200 text-stone-400 font-semibold text-[10px] uppercase">
-                        <th className="py-2">Date</th>
-                        <th className="py-2">Item Description</th>
-                        <th className="py-2 text-center">Qty</th>
-                        <th className="py-2 text-right">Unit Price</th>
-                        <th className="py-2 text-right">Total</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-stone-100">
-                      {allCreditItems.map((item, idx) => (
-                        <tr key={idx}>
-                          <td className="py-2.5 text-stone-400">{item.date}</td>
-                          <td className="py-2.5 font-semibold text-stone-900">{item.name}</td>
-                          <td className="py-2.5 text-center font-bold">{item.qty}</td>
-                          <td className="py-2.5 text-right text-stone-600">{formatNaira(item.unitPrice)}</td>
-                          <td className="py-2.5 text-right font-bold text-stone-900">{formatNaira(item.total)}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                  allCreditItems.map((item, idx) => (
+                    <div
+                      key={idx}
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: "1.2fr 2fr 0.5fr 1fr 1fr",
+                        gap: 4,
+                        padding: "8px 0",
+                        borderBottom: "1px solid #f5f5f4",
+                      }}
+                    >
+                      <p style={{ fontSize: 11, color: "#a8a29e", margin: 0 }}>{item.date}</p>
+                      <p style={{ fontSize: 11, fontWeight: 600, color: "#1c1917", margin: 0 }}>{item.name}</p>
+                      <p style={{ fontSize: 11, fontWeight: 700, color: "#44403c", margin: 0 }}>{item.qty}</p>
+                      <p style={{ fontSize: 11, color: "#57534e", margin: 0 }}>{formatNaira(item.unitPrice)}</p>
+                      <p style={{ fontSize: 11, fontWeight: 700, color: "#1c1917", margin: 0 }}>{formatNaira(item.total)}</p>
+                    </div>
+                  ))
                 )}
               </div>
 
               {/* Financial Totals */}
-              <div className="pt-4 border-t border-stone-100 space-y-1.5 text-right">
-                <div className="flex justify-between text-xs text-stone-500">
-                  <span>Total Credit Purchases:</span>
-                  <span className="font-semibold text-stone-800">{formatNaira(totalCreditAmount)}</span>
+              <div style={{ marginTop: 8, paddingTop: 12, borderTop: "1px solid #e7e5e4" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+                  <p style={{ fontSize: 11, color: "#78716c", margin: 0 }}>Total Credit Purchases</p>
+                  <p style={{ fontSize: 11, fontWeight: 600, color: "#44403c", margin: 0 }}>{formatNaira(totalCreditAmount)}</p>
                 </div>
-                <div className="flex justify-between text-xs text-stone-500">
-                  <span>Total Payments Received:</span>
-                  <span className="font-semibold text-emerald-600">-{formatNaira(totalRepaidAmount)}</span>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
+                  <p style={{ fontSize: 11, color: "#78716c", margin: 0 }}>Total Payments Received</p>
+                  <p style={{ fontSize: 11, fontWeight: 600, color: "#16a34a", margin: 0 }}>−{formatNaira(totalRepaidAmount)}</p>
                 </div>
-                <div className="flex justify-between text-sm font-black pt-2 border-t border-stone-200 text-amber-600">
-                  <span>Outstanding Balance Due:</span>
-                  <span>{formatNaira(customer.total_debt)}</span>
+                <div style={{ display: "flex", justifyContent: "space-between", paddingTop: 10, borderTop: "2px solid #e7e5e4" }}>
+                  <p style={{ fontSize: 13, fontWeight: 800, color: "#1c1917", margin: 0 }}>Outstanding Balance Due</p>
+                  <p style={{ fontSize: 14, fontWeight: 900, color: "#f97316", margin: 0 }}>{formatNaira(customer.total_debt)}</p>
                 </div>
               </div>
 
-              {/* Footer: SalesOS Branding Visibility */}
-              <div className="pt-6 border-t border-stone-100 text-center space-y-1">
-                <p className="text-[11px] font-medium text-stone-400">
-                  Created by <span className="font-bold text-stone-700">SalesOS</span> • Simple POS & Inventory Software
+              {/* SalesOS Footer — anchored at bottom of PDF */}
+              <div style={{ marginTop: 48, paddingTop: 16, borderTop: "1px solid #f5f5f4", textAlign: "center" }}>
+                <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 6, marginBottom: 4 }}>
+                  <Image src="/logo.png" alt="SalesOS" width={18} height={18} style={{ borderRadius: 4 }} />
+                  <p style={{ fontSize: 11, fontWeight: 700, color: "#57534e", margin: 0 }}>SalesOS</p>
+                </div>
+                <p style={{ fontSize: 10, color: "#a8a29e", margin: 0 }}>
+                  Smart Business Management Tool
                 </p>
-                <p className="text-[10px] text-stone-400">
-                  Visit <a href="https://salesos.ng" target="_blank" rel="noopener noreferrer" className="font-bold text-amber-600 underline">salesos.ng</a>
+                <p style={{ fontSize: 10, color: "#f97316", fontWeight: 600, margin: "2px 0 0" }}>
+                  salesos.ng
                 </p>
               </div>
             </div>
@@ -525,27 +609,11 @@ export function CustomerProfileClient({
               <button
                 type="button"
                 onClick={() => setStatementModalOpen(false)}
-                className="flex-1 py-2.5 rounded-xl text-xs font-semibold border bg-stone-50 hover:bg-stone-100 transition-colors"
+                className="py-2.5 px-4 rounded-xl text-xs font-semibold border bg-stone-50 hover:bg-stone-100 transition-colors"
                 style={{ borderColor: "var(--border-color)", color: "var(--text-primary)" }}
               >
                 Close
               </button>
-
-              {customer.phone && (
-                <a
-                  href={`https://wa.me/${customer.phone.replace(/\D/g, "")}?text=${encodeURIComponent(
-                    `${customReminderText}\n\nBank Repayment Details: ${customBankDetails || "Contact shop"}\n\nOutstanding Debt: ${formatNaira(customer.total_debt)}`
-                  )}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-3.5 py-2.5 bg-[#25D366] hover:bg-[#20bd5a] text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-xs"
-                >
-                  <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-                    <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.105 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z" />
-                  </svg>
-                  <span>Share Note</span>
-                </a>
-              )}
 
               <button
                 type="button"
@@ -557,7 +625,7 @@ export function CustomerProfileClient({
                 <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
                   <path fillRule="evenodd" d="M12 2.25a.75.75 0 01.75.75v11.69l3.22-3.22a.75.75 0 111.06 1.06l-4.5 4.5a.75.75 0 01-1.06 0l-4.5-4.5a.75.75 0 111.06-1.06l3.22 3.22V3a.75.75 0 01.75-.75zm-9 13.5a.75.75 0 01.75.75v2.25a1.5 1.5 0 001.5 1.5h13.5a1.5 1.5 0 001.5-1.5V16.5a.75.75 0 011.5 0v2.25a3 3 0 01-3 3H5.25a3 3 0 01-3-3V16.5a.75.75 0 01.75-.75z" clipRule="evenodd" />
                 </svg>
-                {pdfGenerating ? "Generating PDF..." : "Download PDF File"}
+                {pdfGenerating ? "Generating..." : "Download PDF"}
               </button>
             </div>
           </div>
@@ -586,20 +654,20 @@ export function CustomerProfileClient({
           </div>
         </div>
 
-        {/* Action Buttons */}
+        {/* Header Action Buttons */}
         <div className="flex items-center gap-2">
           {/* Debt PDF Invoice Button */}
           <button
             type="button"
             onClick={() => setStatementModalOpen(true)}
-            className="p-2.5 rounded-2xl border bg-white hover:bg-stone-50 transition-colors text-stone-700 shadow-2xs flex items-center gap-1.5 text-xs font-bold"
-            style={{ borderColor: "var(--border-color)" }}
+            className="p-2.5 rounded-2xl border bg-white hover:bg-stone-50 transition-colors shadow-2xs flex items-center gap-1.5 text-xs font-bold"
+            style={{ borderColor: "var(--border-color)", color: "var(--text-primary)" }}
             title="Generate Debt Invoice PDF"
           >
             <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-amber-600">
               <path fillRule="evenodd" d="M5.625 1.5c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V12.75A3.75 3.75 0 0016.5 9h-1.875a.375.375 0 01-.375-.375V6.75A3.75 3.75 0 0010.5 3H5.625z" clipRule="evenodd" />
             </svg>
-            <span className="hidden sm:inline">Debt PDF Invoice</span>
+            <span className="hidden sm:inline text-stone-700">PDF Invoice</span>
           </button>
 
           {/* Edit Button */}
@@ -637,7 +705,7 @@ export function CustomerProfileClient({
         </div>
       </div>
 
-      {/* ── Total Debt Card (Phase 1 Premium Redesign) ── */}
+      {/* ── Premium Total Debt Card ── */}
       <div
         className="p-5 sm:p-6 rounded-2xl border bg-white space-y-4 transition-all"
         style={{
@@ -645,37 +713,35 @@ export function CustomerProfileClient({
           boxShadow: "var(--card-shadow)",
         }}
       >
+        {/* Card Header: Badge + WhatsApp quick reminder top right */}
         <div className="flex items-center justify-between gap-2 flex-wrap">
-          <div>
-            <span
-              className="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full inline-block"
-              style={{
-                background: customer.total_debt > 0 ? "var(--warning-dim)" : "rgba(22,163,74,0.1)",
-                color: customer.total_debt > 0 ? "var(--warning)" : "var(--success)",
-              }}
-            >
-              Total Outstanding Debt
-            </span>
-          </div>
+          <span
+            className="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full inline-block"
+            style={{
+              background: customer.total_debt > 0 ? "var(--warning-dim)" : "rgba(22,163,74,0.1)",
+              color: customer.total_debt > 0 ? "var(--warning)" : "var(--success)",
+            }}
+          >
+            Total Outstanding Debt
+          </span>
 
           {customer.phone && customer.total_debt > 0 && (
             <a
-              href={`https://wa.me/${customer.phone.replace(/\D/g, "")}?text=${encodeURIComponent(
-                `Hello ${customer.name}, this is a friendly debt payment reminder from ${shopName} regarding your outstanding balance of ${formatNaira(customer.total_debt)}. Please let us know when you will be settling this. Thank you!`
-              )}`}
+              href={`https://wa.me/${customer.phone.replace(/\D/g, "")}?text=${encodeURIComponent(whatsappMessage)}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-3.5 py-1.5 bg-[#25D366] hover:bg-[#20bd5a] text-white rounded-full text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm active:scale-[0.97]"
-              title="Send WhatsApp Debt Reminder"
+              className="px-3 py-1.5 bg-[#25D366] hover:bg-[#20bd5a] text-white rounded-full text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm active:scale-[0.97]"
+              title="Send WhatsApp Reminder"
             >
-              <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5">
                 <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.105 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z" />
               </svg>
-              <span>WhatsApp Reminder</span>
+              <span>WhatsApp</span>
             </a>
           )}
         </div>
 
+        {/* Debt Amount */}
         <div>
           <p
             className="text-4xl font-black tracking-tight"
@@ -683,18 +749,19 @@ export function CustomerProfileClient({
           >
             {formatNaira(customer.total_debt)}
           </p>
-          <p className="text-xs mt-1 text-stone-500 font-medium">
+          <p className="text-xs mt-1 font-medium text-stone-500">
             {customer.total_debt > 0
-              ? "Debt balance pending payment"
-              : "No pending balance. Customer account is clear."}
+              ? "Outstanding balance pending settlement"
+              : "No pending balance — account is clear"}
           </p>
         </div>
 
-        <div className="pt-2 flex flex-col sm:flex-row gap-2.5">
+        {/* Action Buttons: Record Repayment + WhatsApp Reminder (replaces second PDF button) */}
+        <div className="flex gap-2.5 pt-1">
           <button
             onClick={() => setModalOpen(true)}
             disabled={customer.total_debt <= 0}
-            className="flex-1 px-5 py-3 rounded-2xl font-bold text-xs text-white transition-all active:scale-[0.98] disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed shadow-sm flex items-center justify-center gap-2"
+            className="flex-1 py-3 rounded-2xl font-bold text-xs text-white transition-all active:scale-[0.98] disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed shadow-sm flex items-center justify-center gap-2"
             style={{ background: "var(--accent)" }}
           >
             <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
@@ -702,17 +769,31 @@ export function CustomerProfileClient({
             </svg>
             Record Repayment
           </button>
-          <button
-            type="button"
-            onClick={() => setStatementModalOpen(true)}
-            className="px-4 py-3 rounded-2xl font-bold text-xs border bg-stone-50 hover:bg-stone-100 transition-colors flex items-center justify-center gap-2 text-stone-700"
-            style={{ borderColor: "var(--border-color)" }}
-          >
-            <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-amber-600">
-              <path fillRule="evenodd" d="M5.625 1.5c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V12.75A3.75 3.75 0 0016.5 9h-1.875a.375.375 0 01-.375-.375V6.75A3.75 3.75 0 0010.5 3H5.625z" clipRule="evenodd" />
-            </svg>
-            Debt PDF Invoice
-          </button>
+
+          {customer.phone && customer.total_debt > 0 ? (
+            <a
+              href={`https://wa.me/${customer.phone.replace(/\D/g, "")}?text=${encodeURIComponent(whatsappMessage)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-4 py-3 rounded-2xl font-bold text-xs text-white transition-all active:scale-[0.97] shadow-sm flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#20bd5a]"
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.105 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z" />
+              </svg>
+              <span>WhatsApp Reminder</span>
+            </a>
+          ) : (
+            <button
+              disabled
+              className="px-4 py-3 rounded-2xl font-bold text-xs border bg-stone-50 text-stone-400 cursor-not-allowed flex items-center justify-center gap-2"
+              style={{ borderColor: "var(--border-color)" }}
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.105 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z" />
+              </svg>
+              <span>WhatsApp Reminder</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -723,13 +804,13 @@ export function CustomerProfileClient({
             Credit Purchase History
           </h3>
           <p className="text-[11px]" style={{ color: "var(--text-muted)" }}>
-            Tap card to view purchased items
+            Tap to view items
           </p>
         </div>
 
         {creditHistory.length === 0 ? (
           <div
-            className="text-xs text-center py-8 rounded-2xl border bg-white"
+            className="text-xs text-center py-10 rounded-2xl border bg-white"
             style={{ borderColor: "var(--border-color)", color: "var(--text-muted)" }}
           >
             No credit history found for this customer.
@@ -774,17 +855,13 @@ export function CustomerProfileClient({
                     </div>
                   </div>
 
-                  {/* Expanded Items Breakdown */}
                   {isExpanded && (
-                    <div
-                      className="mt-3 pt-3 border-t space-y-2.5 animate-fadeIn"
-                      style={{ borderColor: "var(--border-color)" }}
-                    >
+                    <div className="mt-3 pt-3 border-t space-y-2.5" style={{ borderColor: "var(--border-color)" }}>
                       <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
-                        Items in this Purchase:
+                        Items Purchased:
                       </p>
                       {items.length === 0 ? (
-                        <p className="text-xs italic text-stone-400">No item details recorded for this purchase.</p>
+                        <p className="text-xs italic text-stone-400">No item details recorded.</p>
                       ) : (
                         <ul className="space-y-1.5 bg-stone-50 p-3 rounded-2xl border border-stone-100">
                           {items.map((item, idx) => (
@@ -800,7 +877,6 @@ export function CustomerProfileClient({
                         </ul>
                       )}
 
-                      {/* Balance Breakdown */}
                       <div
                         className="flex justify-between items-center text-xs pt-2 border-t border-dashed"
                         style={{ borderColor: "var(--border-color)" }}
@@ -815,9 +891,7 @@ export function CustomerProfileClient({
                       </div>
 
                       {saleObj?.notes && (
-                        <p className="text-xs italic text-stone-500">
-                          Note: {saleObj.notes}
-                        </p>
+                        <p className="text-xs italic text-stone-500">Note: {saleObj.notes}</p>
                       )}
                     </div>
                   )}
