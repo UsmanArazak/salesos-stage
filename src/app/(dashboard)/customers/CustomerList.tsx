@@ -32,11 +32,11 @@ export function CustomerList({ customers }: { customers: CustomerRow[] }) {
       {/* ── Page Header ── */}
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
-            Customers
+          <h1 className="text-xl font-bold" style={{ color: "var(--text-primary)" }}>
+            Debt
           </h1>
-          <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>
-            {customers.length} customer{customers.length !== 1 ? "s" : ""} saved
+          <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+            Track customer debts and outstanding balances
           </p>
         </div>
         <Link
