@@ -263,116 +263,78 @@ export default async function DashboardPage() {
         </Link>
       )}
 
-      {/* ── Hero: Today at a Glance ── */}
+      {/* ── Hero: Today at a Glance (Distinct Brand Accent Card) ── */}
       <div
-        className="rounded-[24px] p-5 space-y-4"
-        style={{ background: "var(--bg-card)", boxShadow: "var(--card-shadow)" }}
+        className="rounded-[24px] p-5 md:p-6 text-white relative overflow-hidden"
+        style={{
+          background: "linear-gradient(135deg, var(--accent) 0%, #e05a00 100%)",
+          boxShadow: "0 10px 25px -5px rgba(253, 103, 1, 0.35)",
+        }}
       >
-        <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
-          Today at a Glance
-        </p>
+        {/* Subtle decorative background glow */}
+        <div
+          className="absolute -right-8 -bottom-8 w-40 h-40 rounded-full pointer-events-none opacity-10"
+          style={{ background: "#ffffff" }}
+        />
 
-        {/* Revenue + vs yesterday */}
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="text-xs mb-1" style={{ color: "var(--text-muted)" }}>Revenue</p>
-            <p className="text-3xl font-bold tracking-tight" style={{ color: "var(--text-primary)" }}>
-              {formatNaira(stats.salesToday)}
-            </p>
-          </div>
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-xs font-bold uppercase tracking-wider text-white/80">
+            Today at a Glance
+          </p>
+          {/* vs yesterday badge */}
           <div
-            className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold flex-shrink-0 mt-1"
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold backdrop-blur-sm"
             style={{
-              background: vsPositive ? "var(--icon-success-bg)" : "var(--icon-danger-bg)",
-              color: vsPositive ? "var(--icon-success-text)" : "var(--icon-danger-text)",
+              background: vsPositive ? "rgba(255, 255, 255, 0.22)" : "rgba(0, 0, 0, 0.22)",
+              color: "#ffffff",
             }}
           >
             <svg viewBox="0 0 24 24" fill="currentColor" className="w-3 h-3">
-              {vsPositive
-                ? <path fillRule="evenodd" d="M11.47 2.47a.75.75 0 011.06 0l4.5 4.5a.75.75 0 01-1.06 1.06l-3.22-3.22V16.5a.75.75 0 01-1.5 0V4.81L8.03 8.03a.75.75 0 01-1.06-1.06l4.5-4.5z" clipRule="evenodd" />
-                : <path fillRule="evenodd" d="M12.53 21.53a.75.75 0 01-1.06 0l-4.5-4.5a.75.75 0 111.06-1.06l3.22 3.22V7.5a.75.75 0 011.5 0v11.69l3.22-3.22a.75.75 0 111.06 1.06l-4.5 4.5z" clipRule="evenodd" />
-              }
+              {vsPositive ? (
+                <path fillRule="evenodd" d="M11.47 2.47a.75.75 0 011.06 0l4.5 4.5a.75.75 0 01-1.06 1.06l-3.22-3.22V16.5a.75.75 0 01-1.5 0V4.81L8.03 8.03a.75.75 0 01-1.06-1.06l4.5-4.5z" clipRule="evenodd" />
+              ) : (
+                <path fillRule="evenodd" d="M12.53 21.53a.75.75 0 01-1.06 0l-4.5-4.5a.75.75 0 111.06-1.06l3.22 3.22V7.5a.75.75 0 011.5 0v11.69l3.22-3.22a.75.75 0 111.06 1.06l-4.5 4.5z" clipRule="evenodd" />
+              )}
             </svg>
-            {formatNaira(Math.abs(stats.vsYesterday))} vs yday
+            <span>{vsPositive ? "+" : "-"}{formatNaira(Math.abs(stats.vsYesterday))} vs yday</span>
           </div>
         </div>
 
-        <div className="h-px" style={{ background: "var(--border)" }} />
+        {/* Revenue Main Figure */}
+        <div className="mb-4">
+          <p className="text-xs text-white/75 font-medium mb-0.5">Total Revenue</p>
+          <p className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
+            {formatNaira(stats.salesToday)}
+          </p>
+        </div>
 
-        {/* Expenses + Net Profit */}
-        <div className="grid grid-cols-2 gap-4">
+        {/* Divider */}
+        <div className="h-px bg-white/20 my-3" />
+
+        {/* Bottom stats: Expenses & Net Profit */}
+        <div className="grid grid-cols-2 gap-4 pt-1">
           <div>
-            <p className="text-xs mb-1" style={{ color: "var(--text-muted)" }}>Expenses</p>
-            <p className="text-xl font-bold" style={{ color: stats.expensesToday > 0 ? "var(--icon-warning-text)" : "var(--text-primary)" }}>
+            <p className="text-xs text-white/75 font-medium mb-0.5">Expenses</p>
+            <p className="text-lg sm:text-xl font-bold text-white">
               {formatNaira(stats.expensesToday)}
             </p>
           </div>
           <div>
-            <p className="text-xs mb-1" style={{ color: "var(--text-muted)" }}>Net Profit</p>
-            <p className="text-xl font-bold" style={{ color: isProfit ? "var(--icon-success-text)" : "var(--icon-danger-text)" }}>
-              {formatNaira(stats.netProfitToday)}
+            <p className="text-xs text-white/75 font-medium mb-0.5">Net Profit</p>
+            <p className="text-lg sm:text-xl font-bold text-white flex items-center gap-1.5">
+              <span>{formatNaira(stats.netProfitToday)}</span>
+              {isProfit && (
+                <span className="inline-block w-2 h-2 rounded-full bg-emerald-300" title="Profitable" />
+              )}
             </p>
           </div>
         </div>
       </div>
 
-      {/* ── Monthly Snapshot Strip ── */}
-      <Link href="/reports">
-        <div
-          className="rounded-[20px] px-4 py-4 transition-all active:scale-[0.99]"
-          style={{ background: "var(--bg-card)", boxShadow: "var(--card-shadow)" }}
-        >
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-xs font-semibold" style={{ color: "var(--text-primary)" }}>
-              {getMonthName()}
-            </p>
-            <p className="text-xs font-semibold" style={{ color: "var(--accent)" }}>View Reports →</p>
-          </div>
-          <div className="grid grid-cols-3 gap-2 text-center">
-            <div>
-              <p className="text-xs mb-0.5" style={{ color: "var(--text-muted)" }}>Revenue</p>
-              <p className="text-sm font-bold truncate" style={{ color: "var(--text-primary)" }}>{formatNaira(stats.monthRevenue)}</p>
-            </div>
-            <div>
-              <p className="text-xs mb-0.5" style={{ color: "var(--text-muted)" }}>Expenses</p>
-              <p className="text-sm font-bold truncate" style={{ color: "var(--text-primary)" }}>{formatNaira(stats.monthExpenses)}</p>
-            </div>
-            <div>
-              <p className="text-xs mb-0.5" style={{ color: "var(--text-muted)" }}>Profit</p>
-              <p className="text-sm font-bold truncate" style={{ color: stats.monthProfit >= 0 ? "var(--icon-success-text)" : "var(--icon-danger-text)" }}>
-                {formatNaira(stats.monthProfit)}
-              </p>
-            </div>
-          </div>
-        </div>
-      </Link>
-
-      {/* ── 2×2 Stat Cards ── */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="rounded-[20px] p-4 flex flex-col gap-2" style={{ background: "var(--bg-card)", boxShadow: "var(--card-shadow)" }}>
-          <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: "var(--icon-accent-bg)", color: "var(--icon-accent-text)" }}>
-            <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-              <path d="M2.25 4.5c0-.83.67-1.5 1.5-1.5h16.5c.83 0 1.5.67 1.5 1.5v15c0 .83-.67 1.5-1.5 1.5H3.75c-.83 0-1.5-.67-1.5-1.5v-15zM3.75 6v3h16.5V6H3.75zm16.5 6H3.75v7.5h16.5V12z" />
-            </svg>
-          </div>
-          <p className="text-xs" style={{ color: "var(--text-muted)" }}>Sales Today</p>
-          <p className="text-lg font-bold leading-tight" style={{ color: "var(--text-primary)" }}>{formatNaira(stats.salesToday)}</p>
-        </div>
-
-        <div className="rounded-[20px] p-4 flex flex-col gap-2" style={{ background: "var(--bg-card)", boxShadow: "var(--card-shadow)" }}>
-          <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: stats.grossProfit >= 0 ? "var(--icon-success-bg)" : "var(--icon-danger-bg)", color: stats.grossProfit >= 0 ? "var(--icon-success-text)" : "var(--icon-danger-text)" }}>
-            <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-              <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 6a.75.75 0 00-1.5 0v.816a3.836 3.836 0 00-1.72.756c-.712.566-1.112 1.35-1.112 2.178 0 .829.4 1.612 1.113 2.178.502.4 1.102.647 1.719.756v2.978a2.536 2.536 0 01-.921-.421l-.879-.66a.75.75 0 00-.9 1.2l.879.66c.533.4 1.169.645 1.821.75V18a.75.75 0 001.5 0v-.81a4.124 4.124 0 001.821-.749c.745-.559 1.179-1.344 1.179-2.191 0-.847-.434-1.632-1.179-2.191a4.122 4.122 0 00-1.821-.75V8.354c.29.082.559.213.786.393l.415.33a.75.75 0 00.933-1.175l-.415-.33a3.836 3.836 0 00-1.719-.755V6z" clipRule="evenodd" />
-            </svg>
-          </div>
-          <p className="text-xs" style={{ color: "var(--text-muted)" }}>Gross Profit</p>
-          <p className="text-lg font-bold leading-tight" style={{ color: stats.grossProfit >= 0 ? "var(--icon-success-text)" : "var(--icon-danger-text)" }}>
-            {formatNaira(stats.grossProfit)}
-          </p>
-        </div>
-
+      {/* ── Action Stat Cards (Between Today & Month) ── */}
+      <div className="grid grid-cols-2 gap-3.5">
         <Link href="/customers" className="block active:scale-[0.98] transition-transform">
-          <div className="rounded-[20px] p-4 flex flex-col gap-2 h-full" style={{ background: "var(--bg-card)", boxShadow: "var(--card-shadow)" }}>
+          <div className="rounded-[20px] p-4 flex flex-col gap-2 h-full bg-white" style={{ background: "var(--bg-card)", boxShadow: "var(--card-shadow)" }}>
             <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: stats.outstandingCredit > 0 ? "var(--icon-warning-bg)" : "var(--icon-neutral-bg)", color: stats.outstandingCredit > 0 ? "var(--icon-warning-text)" : "var(--icon-neutral-text)" }}>
               <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
                 <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
@@ -384,7 +346,7 @@ export default async function DashboardPage() {
         </Link>
 
         <Link href="/inventory/alerts" className="block active:scale-[0.98] transition-transform">
-          <div className="rounded-[20px] p-4 flex flex-col gap-2 h-full" style={{ background: "var(--bg-card)", boxShadow: "var(--card-shadow)" }}>
+          <div className="rounded-[20px] p-4 flex flex-col gap-2 h-full bg-white" style={{ background: "var(--bg-card)", boxShadow: "var(--card-shadow)" }}>
             <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: stats.lowStockCount > 0 ? "var(--icon-danger-bg)" : "var(--icon-success-bg)", color: stats.lowStockCount > 0 ? "var(--icon-danger-text)" : "var(--icon-success-text)" }}>
               <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
                 <path fillRule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" clipRule="evenodd" />
@@ -394,6 +356,53 @@ export default async function DashboardPage() {
             <p className="text-lg font-bold leading-tight" style={{ color: "var(--text-primary)" }}>
               {stats.lowStockCount} item{stats.lowStockCount !== 1 ? "s" : ""}
             </p>
+          </div>
+        </Link>
+      </div>
+
+      {/* ── Separated Section: Monthly Breakdown ── */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between px-1">
+          <p className="text-xs font-bold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
+            Monthly Overview
+          </p>
+          <Link href="/reports" className="text-xs font-semibold" style={{ color: "var(--accent)" }}>
+            Full Report →
+          </Link>
+        </div>
+
+        <Link href="/reports" className="block active:scale-[0.99] transition-transform">
+          <div
+            className="rounded-[20px] p-4.5 transition-all"
+            style={{
+              background: "var(--bg-card)",
+              boxShadow: "var(--card-shadow)",
+            }}
+          >
+            <div className="flex items-center justify-between mb-3 pb-2.5 border-b" style={{ borderColor: "var(--border-color)" }}>
+              <span className="text-sm font-bold" style={{ color: "var(--text-primary)" }}>
+                {getMonthName()} Performance
+              </span>
+              <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full" style={{ background: "var(--icon-neutral-bg)", color: "var(--text-muted)" }}>
+                Running Totals
+              </span>
+            </div>
+            <div className="grid grid-cols-3 gap-2 text-center">
+              <div>
+                <p className="text-xs mb-0.5" style={{ color: "var(--text-muted)" }}>Revenue</p>
+                <p className="text-sm sm:text-base font-bold truncate" style={{ color: "var(--text-primary)" }}>{formatNaira(stats.monthRevenue)}</p>
+              </div>
+              <div>
+                <p className="text-xs mb-0.5" style={{ color: "var(--text-muted)" }}>Expenses</p>
+                <p className="text-sm sm:text-base font-bold truncate" style={{ color: "var(--icon-danger-text)" }}>{formatNaira(stats.monthExpenses)}</p>
+              </div>
+              <div>
+                <p className="text-xs mb-0.5" style={{ color: "var(--text-muted)" }}>Profit</p>
+                <p className="text-sm sm:text-base font-bold truncate" style={{ color: stats.monthProfit >= 0 ? "var(--icon-success-text)" : "var(--icon-danger-text)" }}>
+                  {formatNaira(stats.monthProfit)}
+                </p>
+              </div>
+            </div>
           </div>
         </Link>
       </div>
