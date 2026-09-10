@@ -263,33 +263,37 @@ export default async function DashboardPage() {
         </Link>
       )}
 
-      {/* ── Hero: Today at a Glance (Distinct Brand Accent Card) ── */}
+      {/* ── Hero: Today at a Glance (Aesthetic Soft Light-Orange Gradient) ── */}
       <div
-        className="rounded-[24px] p-5 md:p-6 text-white relative overflow-hidden"
+        className="rounded-[24px] p-5 md:p-6 relative overflow-hidden transition-all"
         style={{
-          background: "linear-gradient(135deg, var(--accent) 0%, #e05a00 100%)",
-          boxShadow: "0 10px 25px -5px rgba(253, 103, 1, 0.35)",
+          background: "linear-gradient(135deg, #fffbf7 0%, #ffede0 50%, #fedac2 100%)",
+          border: "1px solid rgba(253, 103, 1, 0.22)",
+          boxShadow: "0 8px 24px -4px rgba(253, 103, 1, 0.10), 0 2px 6px -1px rgba(0, 0, 0, 0.03)",
         }}
       >
-        {/* Subtle decorative background glow */}
+        {/* Subtle decorative background shimmer */}
         <div
-          className="absolute -right-8 -bottom-8 w-40 h-40 rounded-full pointer-events-none opacity-10"
-          style={{ background: "#ffffff" }}
+          className="absolute -right-12 -bottom-12 w-48 h-48 rounded-full pointer-events-none opacity-40 blur-2xl"
+          style={{ background: "#fdba74" }}
         />
 
-        <div className="flex items-center justify-between mb-3">
-          <p className="text-xs font-bold uppercase tracking-wider text-white/80">
+        <div className="flex items-center justify-between mb-3 relative z-10">
+          <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#c2410c] flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-[#ea580c] inline-block animate-pulse" />
             Today at a Glance
-          </p>
+          </span>
+
           {/* vs yesterday badge */}
           <div
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold backdrop-blur-sm"
+            className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold"
             style={{
-              background: vsPositive ? "rgba(255, 255, 255, 0.22)" : "rgba(0, 0, 0, 0.22)",
-              color: "#ffffff",
+              background: vsPositive ? "rgba(22, 163, 74, 0.12)" : "rgba(239, 68, 68, 0.12)",
+              color: vsPositive ? "#15803d" : "#b91c1c",
+              border: vsPositive ? "1px solid rgba(22, 163, 74, 0.20)" : "1px solid rgba(239, 68, 68, 0.20)",
             }}
           >
-            <svg viewBox="0 0 24 24" fill="currentColor" className="w-3 h-3">
+            <svg viewBox="0 0 24 24" fill="currentColor" className="w-3 h-3 flex-shrink-0">
               {vsPositive ? (
                 <path fillRule="evenodd" d="M11.47 2.47a.75.75 0 011.06 0l4.5 4.5a.75.75 0 01-1.06 1.06l-3.22-3.22V16.5a.75.75 0 01-1.5 0V4.81L8.03 8.03a.75.75 0 01-1.06-1.06l4.5-4.5z" clipRule="evenodd" />
               ) : (
@@ -301,30 +305,30 @@ export default async function DashboardPage() {
         </div>
 
         {/* Revenue Main Figure */}
-        <div className="mb-4">
-          <p className="text-xs text-white/75 font-medium mb-0.5">Total Revenue</p>
-          <p className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
+        <div className="mb-4 relative z-10">
+          <p className="text-xs text-[#9a3412] font-semibold mb-1">Total Revenue</p>
+          <p className="text-3xl sm:text-4xl font-extrabold tracking-tight text-[#373435]">
             {formatNaira(stats.salesToday)}
           </p>
         </div>
 
         {/* Divider */}
-        <div className="h-px bg-white/20 my-3" />
+        <div className="h-px bg-[#fdba74]/35 my-3 relative z-10" />
 
         {/* Bottom stats: Expenses & Net Profit */}
-        <div className="grid grid-cols-2 gap-4 pt-1">
+        <div className="grid grid-cols-2 gap-4 pt-1 relative z-10">
           <div>
-            <p className="text-xs text-white/75 font-medium mb-0.5">Expenses</p>
-            <p className="text-lg sm:text-xl font-bold text-white">
+            <p className="text-xs text-[#9a3412] font-semibold mb-0.5">Expenses</p>
+            <p className="text-lg sm:text-xl font-bold text-[#b91c1c]">
               {formatNaira(stats.expensesToday)}
             </p>
           </div>
           <div>
-            <p className="text-xs text-white/75 font-medium mb-0.5">Net Profit</p>
-            <p className="text-lg sm:text-xl font-bold text-white flex items-center gap-1.5">
+            <p className="text-xs text-[#9a3412] font-semibold mb-0.5">Net Profit</p>
+            <p className="text-lg sm:text-xl font-bold text-[#15803d] flex items-center gap-1.5">
               <span>{formatNaira(stats.netProfitToday)}</span>
               {isProfit && (
-                <span className="inline-block w-2 h-2 rounded-full bg-emerald-300" title="Profitable" />
+                <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" title="Profitable" />
               )}
             </p>
           </div>
@@ -361,44 +365,74 @@ export default async function DashboardPage() {
       </div>
 
       {/* ── Separated Section: Monthly Breakdown ── */}
-      <div className="space-y-2">
+      <div className="space-y-2.5">
         <div className="flex items-center justify-between px-1">
           <p className="text-xs font-bold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
             Monthly Overview
           </p>
-          <Link href="/reports" className="text-xs font-semibold" style={{ color: "var(--accent)" }}>
-            Full Report →
+          <Link
+            href="/reports"
+            className="text-xs font-semibold flex items-center gap-1 transition-colors hover:opacity-80"
+            style={{ color: "var(--accent)" }}
+          >
+            <span>Full Report</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} className="w-3.5 h-3.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+            </svg>
           </Link>
         </div>
 
         <Link href="/reports" className="block active:scale-[0.99] transition-transform">
           <div
-            className="rounded-[20px] p-4.5 transition-all"
+            className="rounded-[22px] p-4 sm:p-5 transition-all"
             style={{
               background: "var(--bg-card)",
               boxShadow: "var(--card-shadow)",
+              border: "1px solid var(--border-color)",
             }}
           >
-            <div className="flex items-center justify-between mb-3 pb-2.5 border-b" style={{ borderColor: "var(--border-color)" }}>
-              <span className="text-sm font-bold" style={{ color: "var(--text-primary)" }}>
-                {getMonthName()} Performance
-              </span>
-              <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full" style={{ background: "var(--icon-neutral-bg)", color: "var(--text-muted)" }}>
+            {/* Header row with Month title + Running Totals Pill */}
+            <div className="flex items-center justify-between mb-3.5 pb-2.5 border-b" style={{ borderColor: "var(--border-color)" }}>
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-[#fd6701]" />
+                <span className="text-sm font-bold tracking-tight" style={{ color: "var(--text-primary)" }}>
+                  {getMonthName()} Performance
+                </span>
+              </div>
+              <span
+                className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full"
+                style={{ background: "var(--icon-neutral-bg)", color: "var(--text-muted)" }}
+              >
                 Running Totals
               </span>
             </div>
-            <div className="grid grid-cols-3 gap-2 text-center">
-              <div>
-                <p className="text-xs mb-0.5" style={{ color: "var(--text-muted)" }}>Revenue</p>
-                <p className="text-sm sm:text-base font-bold truncate" style={{ color: "var(--text-primary)" }}>{formatNaira(stats.monthRevenue)}</p>
+
+            {/* 3 Metric Cells - Mobile-First Grid */}
+            <div className="grid grid-cols-3 gap-2 sm:gap-3">
+              {/* Month Revenue */}
+              <div className="rounded-xl p-2.5 sm:p-3 bg-white flex flex-col justify-center text-center shadow-xs border border-stone-200/60">
+                <p className="text-[11px] font-medium mb-1" style={{ color: "var(--text-muted)" }}>Sales</p>
+                <p className="text-xs sm:text-sm md:text-base font-extrabold tracking-tight truncate" style={{ color: "var(--text-primary)" }}>
+                  {formatNaira(stats.monthRevenue)}
+                </p>
               </div>
-              <div>
-                <p className="text-xs mb-0.5" style={{ color: "var(--text-muted)" }}>Expenses</p>
-                <p className="text-sm sm:text-base font-bold truncate" style={{ color: "var(--icon-danger-text)" }}>{formatNaira(stats.monthExpenses)}</p>
+
+              {/* Month Expenses */}
+              <div className="rounded-xl p-2.5 sm:p-3 bg-white flex flex-col justify-center text-center shadow-xs border border-stone-200/60">
+                <p className="text-[11px] font-medium mb-1" style={{ color: "var(--text-muted)" }}>Expenses</p>
+                <p className="text-xs sm:text-sm md:text-base font-extrabold tracking-tight truncate text-rose-600">
+                  {formatNaira(stats.monthExpenses)}
+                </p>
               </div>
-              <div>
-                <p className="text-xs mb-0.5" style={{ color: "var(--text-muted)" }}>Profit</p>
-                <p className="text-sm sm:text-base font-bold truncate" style={{ color: stats.monthProfit >= 0 ? "var(--icon-success-text)" : "var(--icon-danger-text)" }}>
+
+              {/* Month Profit */}
+              <div className="rounded-xl p-2.5 sm:p-3 bg-white flex flex-col justify-center text-center shadow-xs border border-stone-200/60">
+                <p className="text-[11px] font-medium mb-1" style={{ color: "var(--text-muted)" }}>Net Profit</p>
+                <p
+                  className={`text-xs sm:text-sm md:text-base font-extrabold tracking-tight truncate ${
+                    stats.monthProfit >= 0 ? "text-emerald-600" : "text-rose-600"
+                  }`}
+                >
                   {formatNaira(stats.monthProfit)}
                 </p>
               </div>
