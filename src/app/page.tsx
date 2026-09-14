@@ -68,7 +68,7 @@ export default async function Home() {
 
           {/* Heading */}
           <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-stone-900 leading-[1.1] max-w-4xl mx-auto text-balance">
-            SalesOS helps <span className="underline decoration-orange-500 decoration-wavy decoration-2 inline-block"><CyclingText /></span> <br className="hidden sm:inline" />
+            SalesOS helps <span className="underline decoration-brand decoration-wavy decoration-2 inline-block"><CyclingText /></span> <br className="hidden sm:inline" />
             your business
           </h1>
 
@@ -108,7 +108,7 @@ export default async function Home() {
         {/* ── FEATURES SECTION ────────────────────────────────────────── */}
         <section id="features" className="max-w-5xl mx-auto px-6 py-16 border-t border-stone-200/60">
           <div className="text-center mb-16 space-y-4">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-orange-100 text-orange-600 border border-orange-200/50">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-brand-dim text-brand border border-[var(--accent-border)]">
               FEATURES
             </div>
             <h2 className="text-3xl font-extrabold tracking-tight text-stone-900 text-balance">
@@ -146,26 +146,26 @@ export default async function Home() {
                   <span className="text-stone-400">Weekly net profit</span>
                 </div>
                 <div className="h-40 flex items-end gap-2 sm:gap-3 pt-6 border-b border-stone-100 pb-2">
-                  <div className="bg-stone-200 w-full rounded-t-md transition-all hover:bg-orange-500 relative group" style={{ height: "45%" }}>
-                    <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] font-bold text-stone-500 group-hover:text-orange-600">₦12k</span>
+                  <div className="bg-stone-200 w-full rounded-t-md transition-all hover:bg-brand relative group" style={{ height: "45%" }}>
+                    <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] font-bold text-stone-500 group-hover:text-brand">₦12k</span>
                   </div>
-                  <div className="bg-stone-200 w-full rounded-t-md transition-all hover:bg-orange-500 relative group" style={{ height: "30%" }}>
-                    <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] font-bold text-stone-500 group-hover:text-orange-600">₦8.5k</span>
+                  <div className="bg-stone-200 w-full rounded-t-md transition-all hover:bg-brand relative group" style={{ height: "30%" }}>
+                    <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] font-bold text-stone-500 group-hover:text-brand">₦8.5k</span>
                   </div>
-                  <div className="bg-stone-200 w-full rounded-t-md transition-all hover:bg-orange-500 relative group" style={{ height: "70%" }}>
-                    <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] font-bold text-stone-500 group-hover:text-orange-600">₦18k</span>
+                  <div className="bg-stone-200 w-full rounded-t-md transition-all hover:bg-brand relative group" style={{ height: "70%" }}>
+                    <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] font-bold text-stone-500 group-hover:text-brand">₦18k</span>
                   </div>
-                  <div className="bg-stone-200 w-full rounded-t-md transition-all hover:bg-orange-500 relative group" style={{ height: "50%" }}>
-                    <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] font-bold text-stone-500 group-hover:text-orange-600">₦14k</span>
+                  <div className="bg-stone-200 w-full rounded-t-md transition-all hover:bg-brand relative group" style={{ height: "50%" }}>
+                    <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] font-bold text-stone-500 group-hover:text-brand">₦14k</span>
                   </div>
-                  <div className="bg-orange-500 w-full rounded-t-md shadow-sm relative group" style={{ height: "90%" }}>
-                    <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] font-bold text-orange-600">₦24k</span>
+                  <div className="bg-brand w-full rounded-t-md shadow-sm relative group" style={{ height: "90%" }}>
+                    <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] font-bold text-brand">₦24k</span>
                   </div>
-                  <div className="bg-stone-200 w-full rounded-t-md transition-all hover:bg-orange-500 relative group" style={{ height: "40%" }}>
-                    <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] font-bold text-stone-500 group-hover:text-orange-600">₦11k</span>
+                  <div className="bg-stone-200 w-full rounded-t-md transition-all hover:bg-brand relative group" style={{ height: "40%" }}>
+                    <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] font-bold text-stone-500 group-hover:text-brand">₦11k</span>
                   </div>
-                  <div className="bg-stone-200 w-full rounded-t-md transition-all hover:bg-orange-500 relative group" style={{ height: "60%" }}>
-                    <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] font-bold text-stone-500 group-hover:text-orange-600">₦16k</span>
+                  <div className="bg-stone-200 w-full rounded-t-md transition-all hover:bg-brand relative group" style={{ height: "60%" }}>
+                    <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] font-bold text-stone-500 group-hover:text-brand">₦16k</span>
                   </div>
                 </div>
                 <div className="flex justify-between text-[10px] text-stone-400">
@@ -239,7 +239,7 @@ export default async function Home() {
                         <p className="font-semibold text-stone-850">{debtor.name}</p>
                         <span className="text-[10px] text-stone-400">{debtor.status}</span>
                       </div>
-                      <span className="font-bold text-orange-600">{debtor.amount}</span>
+                      <span className="font-bold text-brand">{debtor.amount}</span>
                     </div>
                   ))}
                 </div>
@@ -339,7 +339,7 @@ export default async function Home() {
                 alt="SalesOS Logo"
                 width={28}
                 height={28}
-                className="rounded-md"
+                className="rounded-lg"
               />
               <span className="font-bold text-white">SalesOS</span>
             </div>

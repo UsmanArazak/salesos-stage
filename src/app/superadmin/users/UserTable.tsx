@@ -24,7 +24,7 @@ function RoleBadge({ role }: { role: string }) {
   const isAdmin = role === "superadmin";
   return (
     <span
-      className="inline-block text-[11px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-md"
+      className="inline-block text-[11px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-lg"
       style={{
         background: isAdmin ? "var(--accent-dim)" : "var(--bg-elevated)",
         color: isAdmin ? "var(--accent)" : "var(--text-muted)",

@@ -20,7 +20,7 @@ export default function Home() {
             className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[11px] font-bold border uppercase tracking-wide"
             style={{ background: "rgba(249,115,22,0.08)", borderColor: "rgba(249,115,22,0.25)", color: "#EA580C" }}
           >
-            <span className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse" />
+            <span className="w-1.5 h-1.5 rounded-full bg-brand animate-pulse" />
             Early Access
           </div>
         </div>
@@ -41,7 +41,7 @@ export default function Home() {
           <div className="relative max-w-3xl mx-auto px-6 pt-20 pb-16 text-center space-y-8">
 
             {/* Top pill */}
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold bg-orange-50 text-orange-700 border border-orange-200/80">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold bg-brand-dim text-[var(--icon-accent-text)] border border-[var(--accent-border)]/80">
               🇳🇬 Built for Nigerian Small Business Owners
             </div>
 
@@ -53,7 +53,7 @@ export default function Home() {
                   <CyclingText />
                 </span>
                 <span
-                  className="absolute bottom-1 left-0 right-0 h-3 rounded-sm -z-0"
+                  className="absolute bottom-1 left-0 right-0 h-3 rounded-lg -z-0"
                   style={{ background: "rgba(249,115,22,0.15)" }}
                 />
               </span>
@@ -74,7 +74,7 @@ export default function Home() {
 
           {/* ── URGENCY / SCARCITY MESSAGE ───────────────────────── */}
           <div className="mb-5 text-center">
-            <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold bg-orange-50 text-orange-800 border border-orange-200/50">
+            <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold bg-brand-dim text-[var(--icon-accent-text)] border border-[var(--accent-border)]">
               ⚡ Limited Slots Available for Free Beta
             </span>
           </div>
@@ -97,7 +97,7 @@ export default function Home() {
               </div>
               <h2 className="text-2xl font-extrabold text-stone-900 tracking-tight">Join the Waitlist</h2>
               <p className="text-sm text-stone-500 max-w-xs mx-auto">
-                Be first in line. Early members get <span className="font-semibold text-orange-600">exclusive premium perks</span> when we launch.
+                Be first in line. Early members get <span className="font-semibold text-brand">exclusive premium perks</span> when we launch.
               </p>
             </div>
 
@@ -113,7 +113,7 @@ export default function Home() {
 
           {/* Branding */}
           <div className="flex items-center gap-2">
-            <Image src="/logo.png" alt="SalesOS" width={20} height={20} className="rounded-md opacity-70" />
+            <Image src="/logo.png" alt="SalesOS" width={20} height={20} className="rounded-lg opacity-70" />
             <span className="font-bold text-white">SalesOS</span>
             <span className="text-stone-600">© 2026. All rights reserved.</span>
           </div>

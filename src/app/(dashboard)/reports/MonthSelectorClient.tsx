@@ -54,10 +54,10 @@ export function MonthSelectorClient({ currentMonth }: Props) {
       <div
         className="px-4 py-1.5 rounded-xl font-bold text-xs tracking-wide select-none"
         style={{
-          background: isCurrentMonth ? "var(--warning-dim)" : "var(--bg-surface)",
-          color: isCurrentMonth ? "var(--warning)" : "var(--text-primary)",
+          background: isCurrentMonth ? "var(--accent-dim)" : "var(--bg-surface)",
+          color: isCurrentMonth ? "var(--accent)" : "var(--text-primary)",
           border: "1px solid",
-          borderColor: isCurrentMonth ? "var(--warning-border)" : "var(--border-color)",
+          borderColor: isCurrentMonth ? "var(--accent-border)" : "var(--border-color)",
         }}
       >
         {getMonthLabel(currentMonth)}

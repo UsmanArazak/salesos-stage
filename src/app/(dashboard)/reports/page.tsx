@@ -501,20 +501,20 @@ export default async function ReportsPage({
         <Link href="/customers">
           <div
             className="flex items-center justify-between p-4 rounded-2xl cursor-pointer hover:opacity-90 transition-opacity"
-            style={{ background: "var(--warning-dim)", border: "1px solid var(--warning-border)" }}
+            style={{ background: "var(--accent-dim)", border: "1px solid var(--accent-border)" }}
           >
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: "rgba(245,158,11,0.15)" }}>
-                <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4" style={{ color: "var(--warning)" }}>
+                <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4" style={{ color: "var(--accent)" }}>
                   <path fillRule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z" clipRule="evenodd" />
                 </svg>
               </div>
               <div>
-                <p className="text-xs font-bold" style={{ color: "var(--warning)" }}>Uncollected Debt</p>
-                <p className="text-[10px]" style={{ color: "var(--warning)", opacity: 0.7 }}>Tap to view all customers →</p>
+                <p className="text-xs font-bold" style={{ color: "var(--accent)" }}>Uncollected Debt</p>
+                <p className="text-[10px]" style={{ color: "var(--accent)", opacity: 0.7 }}>Tap to view all customers →</p>
               </div>
             </div>
-            <p className="text-xl font-black" style={{ color: "var(--warning)" }}>
+            <p className="text-xl font-black" style={{ color: "var(--accent)" }}>
               {formatNaira(totalUncollectedDebt)}
             </p>
           </div>
@@ -550,7 +550,7 @@ export default async function ReportsPage({
                     </div>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0 ml-2">
-                    <span className="font-bold text-xs" style={{ color: "var(--warning)" }}>
+                    <span className="font-bold text-xs" style={{ color: "var(--accent)" }}>
                       {formatNaira(debtor.total_debt)}
                     </span>
                     {debtor.phone && (

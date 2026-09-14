@@ -339,7 +339,7 @@ export default async function DashboardPage() {
       <div className="grid grid-cols-2 gap-3.5">
         <Link href="/customers" className="block active:scale-[0.98] transition-transform">
           <div className="rounded-[20px] p-4 flex flex-col gap-2 h-full bg-white" style={{ background: "var(--bg-card)", boxShadow: "var(--card-shadow)" }}>
-            <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: stats.outstandingCredit > 0 ? "var(--icon-warning-bg)" : "var(--icon-neutral-bg)", color: stats.outstandingCredit > 0 ? "var(--icon-warning-text)" : "var(--icon-neutral-text)" }}>
+            <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: stats.outstandingCredit > 0 ? "var(--icon-accent-bg)" : "var(--icon-neutral-bg)", color: stats.outstandingCredit > 0 ? "var(--icon-accent-text)" : "var(--icon-neutral-text)" }}>
               <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
                 <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
               </svg>
@@ -474,8 +474,8 @@ export default async function DashboardPage() {
                 <div
                   className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold"
                   style={{
-                    background: sale.paymentMethod === "credit" ? "var(--icon-warning-bg)" : sale.paymentMethod === "transfer" ? "rgba(59,130,246,0.12)" : "var(--icon-success-bg)",
-                    color: sale.paymentMethod === "credit" ? "var(--icon-warning-text)" : sale.paymentMethod === "transfer" ? "#2563eb" : "var(--icon-success-text)",
+                    background: sale.paymentMethod === "credit" ? "var(--icon-accent-bg)" : sale.paymentMethod === "transfer" ? "rgba(59,130,246,0.12)" : "var(--icon-success-bg)",
+                    color: sale.paymentMethod === "credit" ? "var(--icon-accent-text)" : sale.paymentMethod === "transfer" ? "#2563eb" : "var(--icon-success-text)",
                   }}
                 >
                   {sale.customerName ? sale.customerName.charAt(0).toUpperCase() : sale.paymentMethod === "transfer" ? (
@@ -493,10 +493,10 @@ export default async function DashboardPage() {
                     <span>{sale.time}</span>
                     <span>•</span>
                     <span
-                      className="px-1.5 py-0.5 rounded-md text-xs font-medium capitalize"
+                      className="px-1.5 py-0.5 rounded-lg text-xs font-medium capitalize"
                       style={{
-                        background: sale.paymentMethod === "credit" ? "var(--icon-warning-bg)" : sale.paymentMethod === "transfer" ? "rgba(59,130,246,0.1)" : "var(--icon-success-bg)",
-                        color: sale.paymentMethod === "credit" ? "var(--icon-warning-text)" : sale.paymentMethod === "transfer" ? "#2563eb" : "var(--icon-success-text)",
+                        background: sale.paymentMethod === "credit" ? "var(--icon-accent-bg)" : sale.paymentMethod === "transfer" ? "rgba(59,130,246,0.1)" : "var(--icon-success-bg)",
+                        color: sale.paymentMethod === "credit" ? "var(--icon-accent-text)" : sale.paymentMethod === "transfer" ? "#2563eb" : "var(--icon-success-text)",
                       }}
                     >
                       {sale.paymentMethod}
@@ -505,7 +505,7 @@ export default async function DashboardPage() {
                   </p>
                 </div>
 
-                <p className="text-sm font-bold flex-shrink-0" style={{ color: sale.paymentMethod === "credit" ? "var(--icon-warning-text)" : "var(--icon-success-text)" }}>
+                <p className="text-sm font-bold flex-shrink-0" style={{ color: sale.paymentMethod === "credit" ? "var(--icon-accent-text)" : "var(--icon-success-text)" }}>
                   +{formatNaira(sale.amount)}
                 </p>
               </div>

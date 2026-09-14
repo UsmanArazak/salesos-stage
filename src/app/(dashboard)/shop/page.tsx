@@ -45,7 +45,7 @@ export default async function ShopSettingsPage() {
     return (
       <div className="py-10 text-center space-y-2">
         <p className="text-sm text-stone-500">Shop not found.</p>
-        <Link href="/dashboard" className="text-xs font-semibold text-orange-600 underline">
+        <Link href="/dashboard" className="text-xs font-semibold text-brand underline">
           Go back to dashboard
         </Link>
       </div>

@@ -68,7 +68,7 @@ export function WaitlistForm() {
           name="name"
           placeholder="Your full name"
           required
-          className="w-full px-4 py-3.5 rounded-xl border border-stone-200 bg-white text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-400 transition-all"
+          className="w-full px-4 py-3.5 rounded-xl border border-stone-200 bg-white text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand transition-all"
         />
       </div>
 
@@ -79,12 +79,12 @@ export function WaitlistForm() {
           name="email"
           placeholder="Email address"
           required
-          className="w-full px-4 py-3.5 rounded-xl border border-stone-200 bg-white text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-400 transition-all"
+          className="w-full px-4 py-3.5 rounded-xl border border-stone-200 bg-white text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand transition-all"
         />
       </div>
 
       {/* WhatsApp */}
-      <div className="flex items-center border border-stone-200 bg-white rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-orange-500/30 focus-within:border-orange-400 transition-all">
+      <div className="flex items-center border border-stone-200 bg-white rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-brand/30 focus-within:border-brand transition-all">
         <span className="px-4 text-sm text-stone-500 border-r border-stone-200 py-3.5 bg-stone-50 shrink-0">
           🇳🇬 +234
         </span>
@@ -103,7 +103,7 @@ export function WaitlistForm() {
           name="business_type"
           required
           defaultValue=""
-          className="w-full appearance-none px-4 py-3.5 rounded-xl border border-stone-200 bg-white text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-400 transition-all cursor-pointer"
+          className="w-full appearance-none px-4 py-3.5 rounded-xl border border-stone-200 bg-white text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand transition-all cursor-pointer"
         >
           <option value="" disabled className="text-stone-400">
             What type of business do you run?

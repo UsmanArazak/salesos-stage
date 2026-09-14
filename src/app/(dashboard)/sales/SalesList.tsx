@@ -77,7 +77,7 @@ function PaymentBadge({ method, bankName }: { method: string; bankName?: string 
     );
   }
   return (
-    <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full" style={{ background: "var(--warning-dim)", color: "var(--warning)" }}>
+    <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full" style={{ background: "var(--accent-dim)", color: "var(--accent)" }}>
       CREDIT
     </span>
   );

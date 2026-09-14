@@ -58,20 +58,20 @@ export function CustomerList({ customers }: { customers: CustomerRow[] }) {
         <div
           className="rounded-2xl border p-4 flex items-center justify-between gap-4 bg-white"
           style={{
-            borderColor: totalOutstandingDebt > 0 ? "var(--warning-border)" : "rgba(22,163,74,0.25)",
+            borderColor: totalOutstandingDebt > 0 ? "var(--accent-border)" : "rgba(22,163,74,0.25)",
             boxShadow: "var(--card-shadow)",
           }}
         >
           <div>
             <p
               className="text-[10px] font-bold uppercase tracking-wider mb-1"
-              style={{ color: totalOutstandingDebt > 0 ? "var(--warning)" : "var(--success)" }}
+              style={{ color: totalOutstandingDebt > 0 ? "var(--accent)" : "var(--success)" }}
             >
               Total Uncollected Debt
             </p>
             <p
               className="text-2xl font-black tracking-tight"
-              style={{ color: totalOutstandingDebt > 0 ? "var(--warning)" : "var(--success)" }}
+              style={{ color: totalOutstandingDebt > 0 ? "var(--accent)" : "var(--success)" }}
             >
               {formatNaira(totalOutstandingDebt)}
             </p>
@@ -84,8 +84,8 @@ export function CustomerList({ customers }: { customers: CustomerRow[] }) {
           <div
             className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
             style={{
-              background: totalOutstandingDebt > 0 ? "var(--warning-dim)" : "rgba(22,163,74,0.12)",
-              color: totalOutstandingDebt > 0 ? "var(--warning)" : "var(--success)",
+              background: totalOutstandingDebt > 0 ? "var(--accent-dim)" : "rgba(22,163,74,0.12)",
+              color: totalOutstandingDebt > 0 ? "var(--accent)" : "var(--success)",
             }}
           >
             <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
@@ -211,7 +211,7 @@ export function CustomerList({ customers }: { customers: CustomerRow[] }) {
                 href={`/customers/${c.id}`}
                 className="block rounded-2xl border bg-white p-3.5 transition-all active:scale-[0.98]"
                 style={{
-                  borderColor: hasDebt ? "var(--warning-border)" : "var(--border-color)",
+                  borderColor: hasDebt ? "var(--accent-border)" : "var(--border-color)",
                   boxShadow: "var(--card-shadow)",
                 }}
               >
@@ -220,8 +220,8 @@ export function CustomerList({ customers }: { customers: CustomerRow[] }) {
                     <div
                       className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-xs"
                       style={{
-                        background: hasDebt ? "var(--warning-dim)" : "var(--icon-neutral-bg)",
-                        color: hasDebt ? "var(--warning)" : "var(--icon-neutral-text)",
+                        background: hasDebt ? "var(--accent-dim)" : "var(--icon-neutral-bg)",
+                        color: hasDebt ? "var(--accent)" : "var(--icon-neutral-text)",
                       }}
                     >
                       <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
@@ -240,7 +240,7 @@ export function CustomerList({ customers }: { customers: CustomerRow[] }) {
 
                   <div className="text-right flex-shrink-0">
                     {hasDebt ? (
-                      <span className="inline-block text-[11px] font-bold px-2 py-0.5 rounded-full" style={{ background: "var(--warning-dim)", color: "var(--warning)" }}>
+                      <span className="inline-block text-[11px] font-bold px-2 py-0.5 rounded-full" style={{ background: "var(--accent-dim)", color: "var(--accent)" }}>
                         Owes {formatNaira(c.total_debt)}
                       </span>
                     ) : (

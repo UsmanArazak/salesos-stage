@@ -210,7 +210,7 @@ export function InventoryList({
           </svg>
           <span>Active Inventory</span>
           <span
-            className="text-[10px] px-1.5 py-0.2 rounded-md font-bold"
+            className="text-[10px] px-1.5 py-0.2 rounded-lg font-bold"
             style={{
               background: activeTab === "active" ? "var(--accent)" : "var(--bg-card)",
               color: activeTab === "active" ? "#ffffff" : "var(--text-muted)",
@@ -239,7 +239,7 @@ export function InventoryList({
           </svg>
           <span>Archived</span>
           <span
-            className="text-[10px] px-1.5 py-0.2 rounded-md font-bold"
+            className="text-[10px] px-1.5 py-0.2 rounded-lg font-bold"
             style={{
               background: activeTab === "archived" ? "var(--text-primary)" : "var(--bg-card)",
               color: activeTab === "archived" ? "#ffffff" : "var(--text-muted)",
@@ -457,14 +457,14 @@ export function InventoryList({
                               <>
                                 {isOutOfStock ? (
                                   <span
-                                    className="text-[10px] font-bold px-2 py-0.5 rounded-md uppercase"
+                                    className="text-[10px] font-bold px-2 py-0.5 rounded-lg uppercase"
                                     style={{ background: "var(--icon-danger-bg)", color: "var(--icon-danger-text)" }}
                                   >
                                     OUT OF STOCK
                                   </span>
                                 ) : isLow ? (
                                   <span
-                                    className="text-[10px] font-bold px-2 py-0.5 rounded-md uppercase"
+                                    className="text-[10px] font-bold px-2 py-0.5 rounded-lg uppercase"
                                     style={{ background: "var(--icon-warning-bg)", color: "var(--icon-warning-text)" }}
                                   >
                                     LOW STOCK ({product.stock_quantity} left)
@@ -481,7 +481,7 @@ export function InventoryList({
 
                             {activeTab === "archived" && (
                               <span
-                                className="text-[10px] font-bold px-2 py-0.5 rounded-md uppercase"
+                                className="text-[10px] font-bold px-2 py-0.5 rounded-lg uppercase"
                                 style={{ background: "var(--icon-neutral-bg)", color: "var(--icon-neutral-text)" }}
                               >
                                 ARCHIVED

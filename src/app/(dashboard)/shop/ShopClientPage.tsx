@@ -196,7 +196,7 @@ export function ShopClientPage({ shop, ownerEmail }: { shop: Shop; ownerEmail: s
           <div className="flex justify-between items-center py-2 border-t text-sm" style={{ borderColor: "var(--border-color)" }}>
             <span style={{ color: "var(--text-muted)" }}>Current Subscription Plan</span>
             <span
-              className="inline-block text-[11px] font-bold uppercase tracking-wide px-2.5 py-0.5 rounded-md"
+              className="inline-block text-[11px] font-bold uppercase tracking-wide px-2.5 py-0.5 rounded-lg"
               style={{
                 background: isPro ? "var(--accent-dim)" : "var(--bg-elevated)",
                 color: isPro ? "var(--accent)" : "var(--text-muted)",

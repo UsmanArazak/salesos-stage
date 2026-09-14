@@ -408,7 +408,7 @@ export function POSClient({ products, customers, bankAccounts, hasSales = false 
                   >
                     <span className="truncate flex-1 text-left">{p.name}</span>
                     <span
-                      className={`text-[10px] px-1.5 py-0.2 rounded-md flex-shrink-0 font-bold ${
+                      className={`text-[10px] px-1.5 py-0.2 rounded-lg flex-shrink-0 font-bold ${
                         inCartQty > 0 ? "bg-white/25 text-white" : "bg-white text-stone-600"
                       }`}
                     >
@@ -431,7 +431,7 @@ export function POSClient({ products, customers, bankAccounts, hasSales = false 
             </h2>
             {cart.length > 0 && (
               <span
-                className="text-[11px] font-bold px-2 py-0.5 rounded-md"
+                className="text-[11px] font-bold px-2 py-0.5 rounded-lg"
                 style={{ background: "var(--accent-dim)", color: "var(--accent)" }}
               >
                 {totalItemsCount} item{totalItemsCount !== 1 ? "s" : ""}
@@ -487,7 +487,7 @@ export function POSClient({ products, customers, bankAccounts, hasSales = false 
                         type="number"
                         value={item.unitPrice}
                         onChange={(e) => updatePrice(item.productId, e.target.value)}
-                        className="w-16 text-[11px] font-semibold px-1.5 py-0.5 rounded-md border focus:outline-none"
+                        className="w-16 text-[11px] font-semibold px-1.5 py-0.5 rounded-lg border focus:outline-none"
                         style={{
                           background: "#ffffff",
                           borderColor: "var(--border-color)",
@@ -551,7 +551,7 @@ export function POSClient({ products, customers, bankAccounts, hasSales = false 
               {[
                 { method: "cash", label: "Cash", icon: "💵", activeBg: "var(--icon-success-bg)", activeText: "var(--icon-success-text)" },
                 { method: "transfer", label: "Transfer", icon: "🏦", activeBg: "rgba(59, 130, 246, 0.12)", activeText: "#2563eb" },
-                { method: "credit", label: "Credit", icon: "💳", activeBg: "var(--icon-warning-bg)", activeText: "var(--icon-warning-text)" },
+                { method: "credit", label: "Credit", icon: "💳", activeBg: "var(--icon-accent-bg)", activeText: "var(--icon-accent-text)" },
               ].map(({ method, label, icon, activeBg, activeText }) => {
                 const active = paymentMethod === method;
                 return (
@@ -621,10 +621,10 @@ export function POSClient({ products, customers, bankAccounts, hasSales = false 
           {paymentMethod === "credit" && (
             <div
               className="pt-2 border-t space-y-2.5"
-              style={{ borderColor: "var(--icon-warning-bg)" }}
+              style={{ borderColor: "var(--icon-accent-bg)" }}
             >
               <div className="flex justify-between items-center">
-                <label className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--icon-warning-text)" }}>
+                <label className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--icon-accent-text)" }}>
                   Debtor Customer Info
                 </label>
                 {cachedCustomers.length > 0 && (
@@ -632,7 +632,7 @@ export function POSClient({ products, customers, bankAccounts, hasSales = false 
                     type="button"
                     onClick={() => setCustomerMode((m) => (m === "existing" ? "new" : "existing"))}
                     className="text-xs font-bold underline"
-                    style={{ color: "var(--icon-warning-text)" }}
+                    style={{ color: "var(--icon-accent-text)" }}
                   >
                     {customerMode === "existing" ? "+ New Customer" : "Select Existing"}
                   </button>

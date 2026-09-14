@@ -70,7 +70,7 @@ function StatusBadge({ status }: { status: string }) {
     );
   }
   return (
-    <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full" style={{ color: "var(--warning)", background: "var(--warning-dim)" }}>
+    <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full" style={{ color: "var(--accent)", background: "var(--accent-dim)" }}>
       UNPAID
     </span>
   );
@@ -709,7 +709,7 @@ export function CustomerProfileClient({
       <div
         className="p-5 sm:p-6 rounded-2xl border bg-white space-y-4 transition-all"
         style={{
-          borderColor: customer.total_debt > 0 ? "var(--warning-border)" : "var(--border-color)",
+          borderColor: customer.total_debt > 0 ? "var(--accent-border)" : "var(--border-color)",
           boxShadow: "var(--card-shadow)",
         }}
       >
@@ -718,8 +718,8 @@ export function CustomerProfileClient({
           <span
             className="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full inline-block"
             style={{
-              background: customer.total_debt > 0 ? "var(--warning-dim)" : "rgba(22,163,74,0.1)",
-              color: customer.total_debt > 0 ? "var(--warning)" : "var(--success)",
+              background: customer.total_debt > 0 ? "var(--accent-dim)" : "rgba(22,163,74,0.1)",
+              color: customer.total_debt > 0 ? "var(--accent)" : "var(--success)",
             }}
           >
             Total Outstanding Debt
@@ -830,7 +830,7 @@ export function CustomerProfileClient({
                 <div
                   key={record.id}
                   onClick={() => toggleExpand(record.id)}
-                  className="p-3.5 rounded-2xl border bg-white cursor-pointer hover:border-orange-300 transition-all select-none"
+                  className="p-3.5 rounded-2xl border bg-white cursor-pointer hover:border-brand transition-all select-none"
                   style={{ borderColor: "var(--border-color)", boxShadow: "var(--card-shadow)" }}
                 >
                   <div className="flex justify-between items-start gap-3">
@@ -884,7 +884,7 @@ export function CustomerProfileClient({
                         <span className="text-stone-500 font-medium">Remaining on this Bill:</span>
                         <span
                           className="font-bold"
-                          style={{ color: remainingDebt > 0 ? "var(--warning)" : "var(--success)" }}
+                          style={{ color: remainingDebt > 0 ? "var(--accent)" : "var(--success)" }}
                         >
                           {formatNaira(remainingDebt)}
                         </span>

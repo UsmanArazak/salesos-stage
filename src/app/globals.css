@@ -33,13 +33,21 @@
   --icon-success-bg:   rgba(22, 163, 74, 0.10);
   --icon-success-text: #15803d;
 
-  /* ── Semantic: warning / amber (derived from primary) ── */
-  --warning:        #fd6701; 
-  --warning-dim:    #fdece2;
-  --warning-border: rgba(253, 103, 1, 0.28);
+  /* ── Semantic: warning / amber ──────────────────── */
+  --warning:        #f59e0b;
+  --warning-dim:    #fdf3dc;
+  --warning-border: rgba(245, 158, 11, 0.28);
   /* icon tint */
-  --icon-warning-bg:   #fdece2;
-  --icon-warning-text: #a34419;
+  --icon-warning-bg:   #fdf3dc;
+  --icon-warning-text: #92400e;
+
+  /* ── Semantic: info / blue ───────────────────────── */
+  --info:         #3b82f6;
+  --info-dim:     #eaf2fe;
+  --info-border:  rgba(59, 130, 246, 0.25);
+  /* icon tint */
+  --icon-info-bg:   #eaf2fe;
+  --icon-info-text: #1d4ed8;
 
   /* ── Semantic: danger / red ─────────────────────── */
   --danger:         #ef4444;
@@ -54,14 +62,14 @@
   --icon-neutral-bg:   #f5f4f2;
   --icon-neutral-text: #736f70;
 
-  /* ── Semantic: accent/orange icon ───────────────── */
+  /* ── Semantic: accent/orange icon (credit/debt tint) ── */
   --icon-accent-bg:   #fdece2;
   --icon-accent-text: #a34419;
 
   /* ── Card / Shadow ──────────────────────────────── */
-  --card-radius:  20px;
-  --card-shadow:  0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-  --card-shadow-hover: 0 4px 12px rgba(0,0,0,0.08);
+  --card-radius:  24px;
+  --card-shadow:  0 10px 30px -10px rgba(55,52,53,0.08);
+  --card-shadow-hover: 0 14px 34px -8px rgba(55,52,53,0.12);
 
   /* ── Admin Panel Tokens (indigo) ─────────────────── */
   --admin-accent:        #4f46e5;

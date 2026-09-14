@@ -25,7 +25,7 @@ function PlanBadge({ plan }: { plan: string }) {
   const isPro = plan === "pro";
   return (
     <span
-      className="inline-block text-[11px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-md"
+      className="inline-block text-[11px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-lg"
       style={{
         background: isPro ? "var(--accent-dim)" : "var(--bg-elevated)",
         color: isPro ? "var(--accent)" : "var(--text-muted)",

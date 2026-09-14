@@ -101,7 +101,7 @@ _Powered by SalesOS · https://salesos.ng_`;
           {/* Shop Branding */}
           <div className="text-center space-y-1 border-b border-dashed border-stone-300 pb-3">
             <div className="flex items-center justify-center gap-1.5 mb-1">
-              <Image src="/logo.png" alt="Shop Logo" width={22} height={22} className="rounded-md" />
+              <Image src="/logo.png" alt="Shop Logo" width={22} height={22} className="rounded-lg" />
               <span className="font-sans font-black text-base text-stone-900 leading-tight">{shopName}</span>
             </div>
             {receipt.shopPhone && <p className="text-stone-500 font-sans text-[11px]">Phone: {receipt.shopPhone}</p>}
