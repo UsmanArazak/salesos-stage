@@ -246,8 +246,8 @@ export default async function DashboardPage() {
               className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
               style={{ background: "rgba(239,68,68,0.15)", color: "var(--icon-danger-text)" }}
             >
-              <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-                <path fillRule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" clipRule="evenodd" />
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+                <path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
               </svg>
             </div>
             <div className="flex-1 min-w-0">
@@ -256,31 +256,31 @@ export default async function DashboardPage() {
               </p>
               <p className="text-xs" style={{ color: "var(--icon-danger-text)", opacity: 0.75 }}>Tap to restock now</p>
             </div>
-            <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 flex-shrink-0" style={{ color: "var(--icon-danger-text)", opacity: 0.5 }}>
-              <path fillRule="evenodd" d="M16.28 11.47a.75.75 0 010 1.06l-7.5 7.5a.75.75 0 01-1.06-1.06L14.69 12 7.72 5.03a.75.75 0 011.06-1.06l7.5 7.5z" clipRule="evenodd" />
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 flex-shrink-0" style={{ color: "var(--icon-danger-text)", opacity: 0.5 }}>
+              <path d="m8.25 4.5 7.5 7.5-7.5 7.5" />
             </svg>
           </div>
         </Link>
       )}
 
-      {/* ── Hero: Today at a Glance (Aesthetic Soft Light-Orange Gradient) ── */}
+      {/* ── Hero: Today at a Glance ── */}
       <div
-        className="rounded-[24px] p-5 md:p-6 relative overflow-hidden transition-all"
+        className="rounded-2xl p-5 md:p-6 relative overflow-hidden transition-all"
         style={{
-          background: "linear-gradient(135deg, #fffbf7 0%, #ffede0 50%, #fedac2 100%)",
-          border: "1px solid rgba(253, 103, 1, 0.22)",
-          boxShadow: "0 8px 24px -4px rgba(253, 103, 1, 0.10), 0 2px 6px -1px rgba(0, 0, 0, 0.03)",
+          background: "linear-gradient(135deg, var(--bg-base) 0%, var(--accent-dim) 100%)",
+          border: "1px solid var(--accent-border)",
+          boxShadow: "var(--card-shadow)",
         }}
       >
         {/* Subtle decorative background shimmer */}
         <div
           className="absolute -right-12 -bottom-12 w-48 h-48 rounded-full pointer-events-none opacity-40 blur-2xl"
-          style={{ background: "#fdba74" }}
+          style={{ background: "var(--accent)" }}
         />
 
         <div className="flex items-center justify-between mb-3 relative z-10">
-          <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-[#c2410c] flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-[#ea580c] inline-block animate-pulse" />
+          <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider flex items-center gap-1.5" style={{ color: "var(--icon-accent-text)" }}>
+            <span className="w-2 h-2 rounded-full inline-block animate-pulse" style={{ background: "var(--accent)" }} />
             Today at a Glance
           </span>
 
@@ -288,16 +288,16 @@ export default async function DashboardPage() {
           <div
             className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold"
             style={{
-              background: vsPositive ? "rgba(22, 163, 74, 0.12)" : "rgba(239, 68, 68, 0.12)",
-              color: vsPositive ? "#15803d" : "#b91c1c",
-              border: vsPositive ? "1px solid rgba(22, 163, 74, 0.20)" : "1px solid rgba(239, 68, 68, 0.20)",
+              background: vsPositive ? "var(--success-dim)" : "var(--danger-dim)",
+              color: vsPositive ? "var(--icon-success-text)" : "var(--icon-danger-text)",
+              border: vsPositive ? "1px solid var(--success-border)" : "1px solid var(--danger-border)",
             }}
           >
-            <svg viewBox="0 0 24 24" fill="currentColor" className="w-3 h-3 flex-shrink-0">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3 flex-shrink-0">
               {vsPositive ? (
-                <path fillRule="evenodd" d="M11.47 2.47a.75.75 0 011.06 0l4.5 4.5a.75.75 0 01-1.06 1.06l-3.22-3.22V16.5a.75.75 0 01-1.5 0V4.81L8.03 8.03a.75.75 0 01-1.06-1.06l4.5-4.5z" clipRule="evenodd" />
+                <path d="M8.25 6.75 12 3m0 0 3.75 3.75M12 3v18" />
               ) : (
-                <path fillRule="evenodd" d="M12.53 21.53a.75.75 0 01-1.06 0l-4.5-4.5a.75.75 0 111.06-1.06l3.22 3.22V7.5a.75.75 0 011.5 0v11.69l3.22-3.22a.75.75 0 111.06 1.06l-4.5 4.5z" clipRule="evenodd" />
+                <path d="M15.75 17.25 12 21m0 0-3.75-3.75M12 21V3" />
               )}
             </svg>
             <span>{vsPositive ? "+" : "-"}{formatNaira(Math.abs(stats.vsYesterday))} vs yday</span>
@@ -306,26 +306,26 @@ export default async function DashboardPage() {
 
         {/* Revenue Main Figure */}
         <div className="mb-4 relative z-10">
-          <p className="text-xs text-[#9a3412] font-semibold mb-1">Total Revenue</p>
-          <p className="text-3xl sm:text-4xl font-extrabold tracking-tight text-[#373435]">
+          <p className="text-xs font-semibold mb-1" style={{ color: "var(--icon-accent-text)" }}>Total Revenue</p>
+          <p className="text-3xl sm:text-4xl font-black tracking-tight" style={{ color: "var(--text-primary)" }}>
             {formatNaira(stats.salesToday)}
           </p>
         </div>
 
         {/* Divider */}
-        <div className="h-px bg-[#fdba74]/35 my-3 relative z-10" />
+        <div className="h-px my-3 relative z-10" style={{ background: "var(--accent-border)" }} />
 
         {/* Bottom stats: Expenses & Net Profit */}
         <div className="grid grid-cols-2 gap-4 pt-1 relative z-10">
           <div>
-            <p className="text-xs text-[#9a3412] font-semibold mb-0.5">Expenses</p>
-            <p className="text-lg sm:text-xl font-bold text-[#b91c1c]">
+            <p className="text-xs font-semibold mb-0.5" style={{ color: "var(--icon-accent-text)" }}>Expenses</p>
+            <p className="text-lg sm:text-xl font-bold" style={{ color: "var(--icon-danger-text)" }}>
               {formatNaira(stats.expensesToday)}
             </p>
           </div>
           <div>
-            <p className="text-xs text-[#9a3412] font-semibold mb-0.5">Net Profit</p>
-            <p className="text-lg sm:text-xl font-bold text-[#15803d] flex items-center gap-1.5">
+            <p className="text-xs font-semibold mb-0.5" style={{ color: "var(--icon-accent-text)" }}>Net Profit</p>
+            <p className="text-lg sm:text-xl font-bold flex items-center gap-1.5" style={{ color: "var(--icon-success-text)" }}>
               <span>{formatNaira(stats.netProfitToday)}</span>
               {isProfit && (
                 <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" title="Profitable" />
@@ -338,10 +338,10 @@ export default async function DashboardPage() {
       {/* ── Action Stat Cards (Between Today & Month) ── */}
       <div className="grid grid-cols-2 gap-3.5">
         <Link href="/customers" className="block active:scale-[0.98] transition-transform">
-          <div className="rounded-[20px] p-4 flex flex-col gap-2 h-full bg-white" style={{ background: "var(--bg-card)", boxShadow: "var(--card-shadow)" }}>
+          <div className="rounded-2xl p-4 flex flex-col gap-2 h-full bg-white" style={{ background: "var(--bg-card)", boxShadow: "var(--card-shadow)" }}>
             <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: stats.outstandingCredit > 0 ? "var(--icon-accent-bg)" : "var(--icon-neutral-bg)", color: stats.outstandingCredit > 0 ? "var(--icon-accent-text)" : "var(--icon-neutral-text)" }}>
-              <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-                <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+                <path d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
               </svg>
             </div>
             <p className="text-xs" style={{ color: "var(--text-muted)" }}>Customer Debt</p>
@@ -350,10 +350,10 @@ export default async function DashboardPage() {
         </Link>
 
         <Link href="/inventory/alerts" className="block active:scale-[0.98] transition-transform">
-          <div className="rounded-[20px] p-4 flex flex-col gap-2 h-full bg-white" style={{ background: "var(--bg-card)", boxShadow: "var(--card-shadow)" }}>
+          <div className="rounded-2xl p-4 flex flex-col gap-2 h-full bg-white" style={{ background: "var(--bg-card)", boxShadow: "var(--card-shadow)" }}>
             <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: stats.lowStockCount > 0 ? "var(--icon-danger-bg)" : "var(--icon-success-bg)", color: stats.lowStockCount > 0 ? "var(--icon-danger-text)" : "var(--icon-success-text)" }}>
-              <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-                <path fillRule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" clipRule="evenodd" />
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+                <path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
               </svg>
             </div>
             <p className="text-xs" style={{ color: "var(--text-muted)" }}>Low Stock</p>
@@ -384,7 +384,7 @@ export default async function DashboardPage() {
 
         <Link href="/reports" className="block active:scale-[0.99] transition-transform">
           <div
-            className="rounded-[22px] p-4 sm:p-5 transition-all"
+            className="rounded-2xl p-4 sm:p-5 transition-all"
             style={{
               background: "var(--bg-card)",
               boxShadow: "var(--card-shadow)",
@@ -394,7 +394,7 @@ export default async function DashboardPage() {
             {/* Header row with Month title + Running Totals Pill */}
             <div className="flex items-center justify-between mb-3.5 pb-2.5 border-b" style={{ borderColor: "var(--border-color)" }}>
               <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#fd6701]" />
+                <span className="w-2 h-2 rounded-full bg-brand" />
                 <span className="text-sm font-bold tracking-tight" style={{ color: "var(--text-primary)" }}>
                   {getMonthName()} Performance
                 </span>
@@ -410,7 +410,7 @@ export default async function DashboardPage() {
             {/* 3 Metric Cells - Mobile-First Grid */}
             <div className="grid grid-cols-3 gap-2 sm:gap-3">
               {/* Month Revenue */}
-              <div className="rounded-xl p-2.5 sm:p-3 bg-white flex flex-col justify-center text-center shadow-xs border border-stone-200/60">
+              <div className="rounded-xl p-2.5 sm:p-3 bg-white flex flex-col justify-center text-center shadow-sm border border-[var(--border-color)]">
                 <p className="text-[11px] font-medium mb-1" style={{ color: "var(--text-muted)" }}>Sales</p>
                 <p className="text-xs sm:text-sm md:text-base font-extrabold tracking-tight truncate" style={{ color: "var(--text-primary)" }}>
                   {formatNaira(stats.monthRevenue)}
@@ -418,7 +418,7 @@ export default async function DashboardPage() {
               </div>
 
               {/* Month Expenses */}
-              <div className="rounded-xl p-2.5 sm:p-3 bg-white flex flex-col justify-center text-center shadow-xs border border-stone-200/60">
+              <div className="rounded-xl p-2.5 sm:p-3 bg-white flex flex-col justify-center text-center shadow-sm border border-[var(--border-color)]">
                 <p className="text-[11px] font-medium mb-1" style={{ color: "var(--text-muted)" }}>Expenses</p>
                 <p className="text-xs sm:text-sm md:text-base font-extrabold tracking-tight truncate text-rose-600">
                   {formatNaira(stats.monthExpenses)}
@@ -426,7 +426,7 @@ export default async function DashboardPage() {
               </div>
 
               {/* Month Profit */}
-              <div className="rounded-xl p-2.5 sm:p-3 bg-white flex flex-col justify-center text-center shadow-xs border border-stone-200/60">
+              <div className="rounded-xl p-2.5 sm:p-3 bg-white flex flex-col justify-center text-center shadow-sm border border-[var(--border-color)]">
                 <p className="text-[11px] font-medium mb-1" style={{ color: "var(--text-muted)" }}>Net Profit</p>
                 <p
                   className={`text-xs sm:text-sm md:text-base font-extrabold tracking-tight truncate ${
@@ -449,10 +449,10 @@ export default async function DashboardPage() {
         </div>
 
         {stats.recentSales.length === 0 ? (
-          <div className="py-10 text-center rounded-[20px] flex flex-col items-center gap-3" style={{ background: "var(--bg-card)" }}>
+          <div className="py-10 text-center rounded-2xl flex flex-col items-center gap-3" style={{ background: "var(--bg-card)" }}>
             <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ background: "var(--icon-neutral-bg)", color: "var(--icon-neutral-text)" }}>
-              <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
-                <path d="M2.25 4.5c0-.83.67-1.5 1.5-1.5h16.5c.83 0 1.5.67 1.5 1.5v15c0 .83-.67 1.5-1.5 1.5H3.75c-.83 0-1.5-.67-1.5-1.5v-15zM3.75 6v3h16.5V6H3.75zm16.5 6H3.75v7.5h16.5V12z" />
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
+                <path d="M3.375 19.5h17.25m-17.25 0a1.125 1.125 0 0 1-1.125-1.125M3.375 19.5h7.5c.621 0 1.125-.504 1.125-1.125m-9.75 0V5.625m0 12.75v-1.5c0-.621.504-1.125 1.125-1.125m18.375 2.625V5.625m0 12.75c0 .621-.504 1.125-1.125 1.125m1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125m0 3.75h-7.5A1.125 1.125 0 0 1 12 18.375m9.75-12.75c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125m19.5 0v1.5c0 .621-.504 1.125-1.125 1.125M2.25 5.625v1.5c0 .621.504 1.125 1.125 1.125m0 0h17.25m-17.25 0h7.5c.621 0 1.125.504 1.125 1.125M3.375 8.25c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125m17.25-3.75h-7.5c-.621 0-1.125.504-1.125 1.125m8.625-1.125c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125M12 10.875v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 10.875c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125M13.125 12h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125M20.625 12c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5M12 14.625v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 14.625c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125m0 1.5v-1.5m0 0c0-.621.504-1.125 1.125-1.125m0 0h7.5" />
               </svg>
             </div>
             <div>
@@ -479,11 +479,11 @@ export default async function DashboardPage() {
                   }}
                 >
                   {sale.customerName ? sale.customerName.charAt(0).toUpperCase() : sale.paymentMethod === "transfer" ? (
-                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5"><path d="M11.584 2.257a.75.75 0 01.832 0l9 6A.75.75 0 0121 9.5v.75H3V9.5a.75.75 0 01.584-.743l9-6zM3.75 11.75h16.5V18H3.75v-6.25zM2 19.5a.75.75 0 01.75-.75h18.5a.75.75 0 010 1.5H2.75A.75.75 0 012 19.5z" /></svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><path d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0 0 12 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75Z" /></svg>
                   ) : sale.paymentMethod === "credit" ? (
-                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" /></svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><path d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" /></svg>
                   ) : (
-                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5"><path d="M2.25 4.5c0-.83.67-1.5 1.5-1.5h16.5c.83 0 1.5.67 1.5 1.5v15c0 .83-.67 1.5-1.5 1.5H3.75c-.83 0-1.5-.67-1.5-1.5v-15zM3.75 6v3h16.5V6H3.75zm16.5 6H3.75v7.5h16.5V12z" /></svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><path d="M3.375 19.5h17.25m-17.25 0a1.125 1.125 0 0 1-1.125-1.125M3.375 19.5h7.5c.621 0 1.125-.504 1.125-1.125m-9.75 0V5.625m0 12.75v-1.5c0-.621.504-1.125 1.125-1.125m18.375 2.625V5.625m0 12.75c0 .621-.504 1.125-1.125 1.125m1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125m0 3.75h-7.5A1.125 1.125 0 0 1 12 18.375m9.75-12.75c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125m19.5 0v1.5c0 .621-.504 1.125-1.125 1.125M2.25 5.625v1.5c0 .621.504 1.125 1.125 1.125m0 0h17.25m-17.25 0h7.5c.621 0 1.125.504 1.125 1.125M3.375 8.25c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125m17.25-3.75h-7.5c-.621 0-1.125.504-1.125 1.125m8.625-1.125c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125M12 10.875v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 10.875c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125M13.125 12h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125M20.625 12c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5M12 14.625v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 14.625c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125m0 1.5v-1.5m0 0c0-.621.504-1.125 1.125-1.125m0 0h7.5" /></svg>
                   )}
                 </div>
 
@@ -519,12 +519,12 @@ export default async function DashboardPage() {
         <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: "var(--text-muted)" }}>Quick Actions</p>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
-            { label: "Add Product", href: "/inventory/new", iconBg: "var(--icon-neutral-bg)", iconColor: "var(--icon-neutral-text)", icon: <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5"><path d="M3.375 3C2.339 3 1.5 3.84 1.5 4.875v.75c0 1.036.84 1.875 1.875 1.875h17.25c1.035 0 1.875-.84 1.875-1.875v-.75C22.5 3.839 21.66 3 20.625 3H3.375z" /><path fillRule="evenodd" d="M3.087 9l.54 9.176A3 3 0 006.62 21h10.757a3 3 0 002.995-2.824L20.913 9H3.087zm6.163 3.75A.75.75 0 0110 12h4a.75.75 0 010 1.5h-4a.75.75 0 01-.75-.75z" clipRule="evenodd" /></svg> },
-            { label: "Add Debtor", href: "/customers/new", iconBg: "var(--icon-neutral-bg)", iconColor: "var(--icon-neutral-text)", icon: <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" /></svg> },
-            { label: "View Reports", href: "/reports", iconBg: "var(--icon-accent-bg)", iconColor: "var(--icon-accent-text)", icon: <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5"><path d="M18 4h-2v16h2V4zM12 9h-2v11h2V9zM6 14H4v6h2v-6z" /></svg> },
-            { label: "Expenses", href: "/expenses", iconBg: "var(--icon-danger-bg)", iconColor: "var(--icon-danger-text)", icon: <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5"><path d="M12 4l-4 4h3v7h2V8h3l-4-4zm0 16l4-4h-3v-7h-2v7H8l4 4z" /></svg> },
+            { label: "Add Product", href: "/inventory/new", iconBg: "var(--icon-neutral-bg)", iconColor: "var(--icon-neutral-text)", icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><path d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" /></svg> },
+            { label: "Add Debtor", href: "/customers/new", iconBg: "var(--icon-neutral-bg)", iconColor: "var(--icon-neutral-text)", icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><path d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" /></svg> },
+            { label: "View Reports", href: "/reports", iconBg: "var(--icon-accent-bg)", iconColor: "var(--icon-accent-text)", icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><path d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z" /></svg> },
+            { label: "Expenses", href: "/expenses", iconBg: "var(--icon-danger-bg)", iconColor: "var(--icon-danger-text)", icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><path d="M3 7.5 7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5" /></svg> },
           ].map((action) => (
-            <Link key={action.href} href={action.href} className="flex flex-col items-center gap-2.5 rounded-[20px] px-3 py-4 text-sm font-semibold transition-all active:scale-[0.97] bg-white text-center" style={{ boxShadow: "var(--card-shadow)", color: "var(--text-primary)" }}>
+            <Link key={action.href} href={action.href} className="flex flex-col items-center gap-2.5 rounded-2xl px-3 py-4 text-sm font-semibold transition-all active:scale-[0.97] bg-white text-center" style={{ boxShadow: "var(--card-shadow)", color: "var(--text-primary)" }}>
               <span className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: action.iconBg, color: action.iconColor }}>
                 {action.icon}
               </span>
