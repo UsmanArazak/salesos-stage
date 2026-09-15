@@ -335,41 +335,14 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      {/* ── Action Stat Cards (Between Today & Month) ── */}
-      <div className="grid grid-cols-2 gap-3.5">
-        <Link href="/customers" className="block active:scale-[0.98] transition-transform">
-          <div className="rounded-2xl p-4 flex flex-col gap-2 h-full bg-white" style={{ background: "var(--bg-card)", boxShadow: "var(--card-shadow)" }}>
-            <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: stats.outstandingCredit > 0 ? "var(--icon-accent-bg)" : "var(--icon-neutral-bg)", color: stats.outstandingCredit > 0 ? "var(--icon-accent-text)" : "var(--icon-neutral-text)" }}>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
-                <path d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
-              </svg>
-            </div>
-            <p className="text-xs" style={{ color: "var(--text-muted)" }}>Customer Debt</p>
-            <p className="text-lg font-bold leading-tight" style={{ color: "var(--text-primary)" }}>{formatNaira(stats.outstandingCredit)}</p>
-          </div>
-        </Link>
-
-        <Link href="/inventory/alerts" className="block active:scale-[0.98] transition-transform">
-          <div className="rounded-2xl p-4 flex flex-col gap-2 h-full bg-white" style={{ background: "var(--bg-card)", boxShadow: "var(--card-shadow)" }}>
-            <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: stats.lowStockCount > 0 ? "var(--icon-danger-bg)" : "var(--icon-success-bg)", color: stats.lowStockCount > 0 ? "var(--icon-danger-text)" : "var(--icon-success-text)" }}>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
-                <path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
-              </svg>
-            </div>
-            <p className="text-xs" style={{ color: "var(--text-muted)" }}>Low Stock</p>
-            <p className="text-lg font-bold leading-tight" style={{ color: "var(--text-primary)" }}>
-              {stats.lowStockCount} item{stats.lowStockCount !== 1 ? "s" : ""}
-            </p>
-          </div>
-        </Link>
-      </div>
-
-      {/* ── Separated Section: Monthly Breakdown ── */}
-      <div className="space-y-2.5">
-        <div className="flex items-center justify-between px-1">
-          <p className="text-xs font-bold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
-            Monthly Overview
-          </p>
+      {/* ── Overview Panel (Customer Debt, Low Stock, Month Performance — one panel) ── */}
+      <div
+        className="rounded-2xl overflow-hidden"
+        style={{ background: "var(--bg-card)", boxShadow: "var(--card-shadow)", border: "1px solid var(--border-color)" }}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between px-4 sm:px-5 pt-4 sm:pt-5 pb-3">
+          <span className="text-xs font-bold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>Overview</span>
           <Link
             href="/reports"
             className="text-xs font-semibold flex items-center gap-1 transition-colors hover:opacity-80"
@@ -382,61 +355,59 @@ export default async function DashboardPage() {
           </Link>
         </div>
 
-        <Link href="/reports" className="block active:scale-[0.99] transition-transform">
-          <div
-            className="rounded-2xl p-4 sm:p-5 transition-all"
-            style={{
-              background: "var(--bg-card)",
-              boxShadow: "var(--card-shadow)",
-              border: "1px solid var(--border-color)",
-            }}
-          >
-            {/* Header row with Month title + Running Totals Pill */}
-            <div className="flex items-center justify-between mb-3.5 pb-2.5 border-b" style={{ borderColor: "var(--border-color)" }}>
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-brand" />
-                <span className="text-sm font-bold tracking-tight" style={{ color: "var(--text-primary)" }}>
-                  {getMonthName()} Performance
-                </span>
-              </div>
-              <span
-                className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full"
-                style={{ background: "var(--icon-neutral-bg)", color: "var(--text-muted)" }}
-              >
-                Running Totals
-              </span>
+        {/* Row 1: Customer Debt + Low Stock (actionable) */}
+        <div className="grid grid-cols-2 divide-x divide-[var(--border-color)]">
+          <Link href="/customers" className="flex items-center gap-2.5 px-4 sm:px-5 py-3 active:opacity-70 transition-opacity min-w-0">
+            <div
+              className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+              style={{ background: stats.outstandingCredit > 0 ? "var(--icon-accent-bg)" : "var(--icon-neutral-bg)", color: stats.outstandingCredit > 0 ? "var(--icon-accent-text)" : "var(--icon-neutral-text)" }}
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+                <path d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
+              </svg>
             </div>
-
-            {/* 3 Metric Cells - Mobile-First Grid */}
-            <div className="grid grid-cols-3 gap-2 sm:gap-3">
-              {/* Month Revenue */}
-              <div className="rounded-xl p-2.5 sm:p-3 bg-white flex flex-col justify-center text-center shadow-sm border border-[var(--border-color)]">
-                <p className="text-[11px] font-medium mb-1" style={{ color: "var(--text-muted)" }}>Sales</p>
-                <p className="text-xs sm:text-sm md:text-base font-extrabold tracking-tight truncate" style={{ color: "var(--text-primary)" }}>
-                  {formatNaira(stats.monthRevenue)}
-                </p>
-              </div>
-
-              {/* Month Expenses */}
-              <div className="rounded-xl p-2.5 sm:p-3 bg-white flex flex-col justify-center text-center shadow-sm border border-[var(--border-color)]">
-                <p className="text-[11px] font-medium mb-1" style={{ color: "var(--text-muted)" }}>Expenses</p>
-                <p className="text-xs sm:text-sm md:text-base font-extrabold tracking-tight truncate text-rose-600">
-                  {formatNaira(stats.monthExpenses)}
-                </p>
-              </div>
-
-              {/* Month Profit */}
-              <div className="rounded-xl p-2.5 sm:p-3 bg-white flex flex-col justify-center text-center shadow-sm border border-[var(--border-color)]">
-                <p className="text-[11px] font-medium mb-1" style={{ color: "var(--text-muted)" }}>Net Profit</p>
-                <p
-                  className={`text-xs sm:text-sm md:text-base font-extrabold tracking-tight truncate ${
-                    stats.monthProfit >= 0 ? "text-emerald-600" : "text-rose-600"
-                  }`}
-                >
-                  {formatNaira(stats.monthProfit)}
-                </p>
-              </div>
+            <div className="min-w-0">
+              <p className="text-[11px]" style={{ color: "var(--text-muted)" }}>Customer Debt</p>
+              <p className="text-sm font-bold truncate" style={{ color: "var(--text-primary)" }}>{formatNaira(stats.outstandingCredit)}</p>
             </div>
+          </Link>
+
+          <Link href="/inventory/alerts" className="flex items-center gap-2.5 px-4 sm:px-5 py-3 active:opacity-70 transition-opacity min-w-0">
+            <div
+              className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+              style={{ background: stats.lowStockCount > 0 ? "var(--icon-danger-bg)" : "var(--icon-success-bg)", color: stats.lowStockCount > 0 ? "var(--icon-danger-text)" : "var(--icon-success-text)" }}
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+                <path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+              </svg>
+            </div>
+            <div className="min-w-0">
+              <p className="text-[11px]" style={{ color: "var(--text-muted)" }}>Low Stock</p>
+              <p className="text-sm font-bold truncate" style={{ color: "var(--text-primary)" }}>
+                {stats.lowStockCount} item{stats.lowStockCount !== 1 ? "s" : ""}
+              </p>
+            </div>
+          </Link>
+        </div>
+
+        {/* Divider */}
+        <div className="h-px" style={{ background: "var(--border-color)" }} />
+
+        {/* Row 2: This month's Sales / Expenses / Profit */}
+        <Link href="/reports" className="grid grid-cols-3 divide-x divide-[var(--border-color)] active:opacity-80 transition-opacity">
+          <div className="px-3 sm:px-4 py-3.5 text-center min-w-0">
+            <p className="text-[11px] mb-1 truncate" style={{ color: "var(--text-muted)" }}>{getMonthName()} Sales</p>
+            <p className="text-xs sm:text-sm font-bold truncate" style={{ color: "var(--text-primary)" }}>{formatNaira(stats.monthRevenue)}</p>
+          </div>
+          <div className="px-3 sm:px-4 py-3.5 text-center min-w-0">
+            <p className="text-[11px] mb-1" style={{ color: "var(--text-muted)" }}>Expenses</p>
+            <p className="text-xs sm:text-sm font-bold truncate" style={{ color: "var(--icon-danger-text)" }}>{formatNaira(stats.monthExpenses)}</p>
+          </div>
+          <div className="px-3 sm:px-4 py-3.5 text-center min-w-0">
+            <p className="text-[11px] mb-1" style={{ color: "var(--text-muted)" }}>Profit</p>
+            <p className="text-xs sm:text-sm font-bold truncate" style={{ color: stats.monthProfit >= 0 ? "var(--icon-success-text)" : "var(--icon-danger-text)" }}>
+              {formatNaira(stats.monthProfit)}
+            </p>
           </div>
         </Link>
       </div>
@@ -444,7 +415,7 @@ export default async function DashboardPage() {
       {/* ── Recent Sales ── */}
       <div>
         <div className="flex items-center justify-between mb-3 px-1">
-          <p className="text-sm font-bold" style={{ color: "var(--text-primary)" }}>Recent Sales</p>
+          <p className="text-xs font-bold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>Recent Sales</p>
           <Link href="/sales" className="text-xs font-semibold" style={{ color: "var(--accent)" }}>View all →</Link>
         </div>
 
@@ -464,12 +435,14 @@ export default async function DashboardPage() {
             </Link>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div
+            className="rounded-2xl overflow-hidden divide-y divide-[var(--border-color)]"
+            style={{ background: "var(--bg-card)", boxShadow: "var(--card-shadow)", border: "1px solid var(--border-color)" }}
+          >
             {stats.recentSales.map((sale) => (
               <div
                 key={sale.id}
-                className="flex items-center gap-3 rounded-[24px] p-4"
-                style={{ background: "var(--bg-card)", boxShadow: "var(--card-shadow)" }}
+                className="flex items-center gap-3 p-4"
               >
                 <div
                   className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold"
@@ -516,7 +489,7 @@ export default async function DashboardPage() {
 
       {/* ── Quick Actions ── */}
       <div>
-        <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: "var(--text-muted)" }}>Quick Actions</p>
+        <p className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: "var(--text-muted)" }}>Quick Actions</p>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
             { label: "Add Product", href: "/inventory/new", iconBg: "var(--icon-neutral-bg)", iconColor: "var(--icon-neutral-text)", icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><path d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" /></svg> },
@@ -524,7 +497,7 @@ export default async function DashboardPage() {
             { label: "View Reports", href: "/reports", iconBg: "var(--icon-accent-bg)", iconColor: "var(--icon-accent-text)", icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><path d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z" /></svg> },
             { label: "Expenses", href: "/expenses", iconBg: "var(--icon-danger-bg)", iconColor: "var(--icon-danger-text)", icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><path d="M3 7.5 7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5" /></svg> },
           ].map((action) => (
-            <Link key={action.href} href={action.href} className="flex flex-col items-center gap-2.5 rounded-2xl px-3 py-4 text-sm font-semibold transition-all active:scale-[0.97] bg-white text-center" style={{ boxShadow: "var(--card-shadow)", color: "var(--text-primary)" }}>
+            <Link key={action.href} href={action.href} className="flex flex-col items-center gap-2 rounded-2xl px-3 py-3 text-xs font-semibold transition-all active:scale-[0.97] text-center hover:bg-[var(--icon-neutral-bg)]" style={{ color: "var(--text-primary)" }}>
               <span className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: action.iconBg, color: action.iconColor }}>
                 {action.icon}
               </span>
