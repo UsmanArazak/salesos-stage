@@ -236,31 +236,37 @@ export function ShopClientPage({ shop, ownerEmail }: { shop: Shop; ownerEmail: s
           {bankAccounts.length === 0 ? (
             <p className="text-xs italic py-1" style={{ color: "var(--text-muted)" }}>No bank accounts registered yet. Add one below.</p>
           ) : (
-            <div className="flex flex-wrap gap-2">
-              {bankAccounts.map((bank, index) => (
-                <span
-                  key={index}
-                  className="inline-flex items-center gap-2 pl-2.5 pr-1.5 py-1.5 rounded-xl border text-xs font-semibold"
-                  style={{ borderColor: "var(--border-color)", background: "var(--icon-neutral-bg)", color: "var(--text-primary)" }}
-                >
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "var(--icon-neutral-text)" }}>
-                    <path d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0 0 12 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75Z" />
-                  </svg>
-                  {bank}
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveBank(bank)}
-                    className="w-4 h-4 rounded-full flex items-center justify-center transition-colors flex-shrink-0"
-                    style={{ color: "var(--icon-neutral-text)" }}
-                    title="Remove"
+            bankAccounts.map((bank, index) => (
+              <div
+                key={index}
+                className="flex items-center justify-between gap-3 p-3 rounded-2xl"
+                style={{ background: "var(--icon-neutral-bg)" }}
+              >
+                <div className="flex items-center gap-3 min-w-0">
+                  <div
+                    className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-sm text-white"
+                    style={{ background: "var(--accent)" }}
                   >
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" className="w-3 h-3">
-                      <path d="M18 6 6 18M6 6l12 12" />
-                    </svg>
-                  </button>
-                </span>
-              ))}
-            </div>
+                    {bank.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold truncate" style={{ color: "var(--text-primary)" }}>{bank}</p>
+                    <p className="text-[10px]" style={{ color: "var(--text-muted)" }}>Receives customer transfers</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleRemoveBank(bank)}
+                  className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition-colors"
+                  style={{ color: "var(--icon-neutral-text)" }}
+                  title="Remove"
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" className="w-4 h-4">
+                    <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z" />
+                  </svg>
+                </button>
+              </div>
+            ))
           )}
         </div>
 
