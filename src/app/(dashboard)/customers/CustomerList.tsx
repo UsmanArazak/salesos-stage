@@ -53,45 +53,55 @@ export function CustomerList({ customers }: { customers: CustomerRow[] }) {
         </Link>
       </div>
 
-      {/* ── Total Debt Summary Card ── */}
+      {/* ── Total Debt Summary: Hero ── */}
       {customers.length > 0 && (
         <div
-          className="rounded-2xl border p-4 flex items-center justify-between gap-4 bg-white"
+          className="rounded-2xl p-5 relative overflow-hidden"
           style={{
-            borderColor: totalOutstandingDebt > 0 ? "var(--accent-border)" : "rgba(22,163,74,0.25)",
+            background: totalOutstandingDebt > 0
+              ? "linear-gradient(135deg, var(--bg-base) 0%, var(--accent-dim) 100%)"
+              : "linear-gradient(135deg, var(--bg-base) 0%, var(--success-dim) 100%)",
+            border: totalOutstandingDebt > 0 ? "1px solid var(--accent-border)" : "1px solid var(--success-border)",
             boxShadow: "var(--card-shadow)",
           }}
         >
-          <div>
-            <p
-              className="text-[10px] font-bold uppercase tracking-wider mb-1"
-              style={{ color: totalOutstandingDebt > 0 ? "var(--accent)" : "var(--success)" }}
-            >
-              Total Uncollected Debt
-            </p>
-            <p
-              className="text-2xl font-black tracking-tight"
-              style={{ color: totalOutstandingDebt > 0 ? "var(--accent)" : "var(--success)" }}
-            >
-              {formatNaira(totalOutstandingDebt)}
-            </p>
-            <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>
-              {debtorsCount > 0
-                ? `${debtorsCount} customer${debtorsCount !== 1 ? "s" : ""} owe you money`
-                : "All customer debts are cleared!"}
-            </p>
-          </div>
           <div
-            className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-            style={{
-              background: totalOutstandingDebt > 0 ? "var(--accent-dim)" : "rgba(22,163,74,0.12)",
-              color: totalOutstandingDebt > 0 ? "var(--accent)" : "var(--success)",
-            }}
-          >
-            <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-              <path d="M4.5 3.75a3 3 0 00-3 3v.75h21v-.75a3 3 0 00-3-3h-15z" />
-              <path fillRule="evenodd" d="M22.5 9.75h-21v7.5a3 3 0 003 3h15a3 3 0 003-3v-7.5zm-18 3.75a.75.75 0 01.75-.75h6a.75.75 0 010 1.5h-6a.75.75 0 01-.75-.75zm.75 2.25a.75.75 0 000 1.5h3a.75.75 0 000-1.5h-3z" clipRule="evenodd" />
-            </svg>
+            className="absolute -right-12 -bottom-12 w-48 h-48 rounded-full pointer-events-none opacity-40 blur-2xl"
+            style={{ background: totalOutstandingDebt > 0 ? "var(--accent)" : "var(--success)" }}
+          />
+
+          <div className="relative z-10 flex items-center justify-between gap-4">
+            <div>
+              <span
+                className="text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 mb-2"
+                style={{ color: totalOutstandingDebt > 0 ? "var(--icon-accent-text)" : "var(--icon-success-text)" }}
+              >
+                <span
+                  className="w-2 h-2 rounded-full inline-block animate-pulse"
+                  style={{ background: totalOutstandingDebt > 0 ? "var(--accent)" : "var(--success)" }}
+                />
+                Total Uncollected Debt
+              </span>
+              <p className="text-3xl sm:text-4xl font-black tracking-tight" style={{ color: "var(--text-primary)" }}>
+                {formatNaira(totalOutstandingDebt)}
+              </p>
+              <p className="text-xs mt-1" style={{ color: totalOutstandingDebt > 0 ? "var(--icon-accent-text)" : "var(--icon-success-text)" }}>
+                {debtorsCount > 0
+                  ? `${debtorsCount} customer${debtorsCount !== 1 ? "s" : ""} owe you money`
+                  : "All customer debts are cleared!"}
+              </p>
+            </div>
+            <div
+              className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
+              style={{
+                background: totalOutstandingDebt > 0 ? "var(--icon-accent-bg)" : "var(--icon-success-bg)",
+                color: totalOutstandingDebt > 0 ? "var(--icon-accent-text)" : "var(--icon-success-text)",
+              }}
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
+                <path d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z" />
+              </svg>
+            </div>
           </div>
         </div>
       )}
@@ -144,7 +154,7 @@ export function CustomerList({ customers }: { customers: CustomerRow[] }) {
                 type="button"
                 onClick={() => setTabFilter(tab.id)}
                 className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 whitespace-nowrap ${
-                  active ? "shadow-xs" : ""
+                  active ? "shadow-sm" : ""
                 }`}
                 style={{
                   background: active ? "var(--accent)" : "transparent",
@@ -177,8 +187,8 @@ export function CustomerList({ customers }: { customers: CustomerRow[] }) {
             className="w-10 h-10 rounded-full flex items-center justify-center mx-auto"
             style={{ background: "var(--icon-neutral-bg)", color: "var(--icon-neutral-text)" }}
           >
-            <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-              <path d="M4.5 6.375a4.125 4.125 0 118.25 0 4.125 4.125 0 01-8.25 0zM14.25 8.625a3.375 3.375 0 116.75 0 3.375 3.375 0 01-6.75 0zM1.5 19.125a7.125 7.125 0 0114.25 0v.003l-.001.119a.75.75 0 01-.363.63 13.067 13.067 0 01-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 01-.364-.63l-.001-.122zM17.25 19.128l-.001.144a.75.75 0 01-.247.55 14.54 14.54 0 01-3.666 2.052c.983.257 2.02.392 3.09.392 2.193 0 4.24-.555 6.026-1.533a.75.75 0 00.348-.561l.001-.144a6.375 6.375 0 00-5.552-6.326 5.625 5.625 0 010 5.426z" />
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+              <path d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
             </svg>
           </div>
           <div>
@@ -202,18 +212,17 @@ export function CustomerList({ customers }: { customers: CustomerRow[] }) {
           )}
         </div>
       ) : (
-        <div className="space-y-2.5">
+        <div
+          className="rounded-2xl overflow-hidden divide-y divide-[var(--border-color)]"
+          style={{ background: "var(--bg-card)", boxShadow: "var(--card-shadow)", border: "1px solid var(--border-color)" }}
+        >
           {filtered.map((c) => {
             const hasDebt = c.total_debt > 0;
             return (
               <Link
                 key={c.id}
                 href={`/customers/${c.id}`}
-                className="block rounded-2xl border bg-white p-3.5 transition-all active:scale-[0.98]"
-                style={{
-                  borderColor: hasDebt ? "var(--accent-border)" : "var(--border-color)",
-                  boxShadow: "var(--card-shadow)",
-                }}
+                className="block p-3.5 transition-all active:opacity-70"
               >
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -224,8 +233,8 @@ export function CustomerList({ customers }: { customers: CustomerRow[] }) {
                         color: hasDebt ? "var(--accent)" : "var(--icon-neutral-text)",
                       }}
                     >
-                      <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-                        <path fillRule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.6-7.812-1.7a.75.75 0 01-.437-.695z" clipRule="evenodd" />
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+                        <path d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                       </svg>
                     </div>
                     <div className="min-w-0 flex-1">
@@ -244,7 +253,7 @@ export function CustomerList({ customers }: { customers: CustomerRow[] }) {
                         Owes {formatNaira(c.total_debt)}
                       </span>
                     ) : (
-                      <span className="inline-block text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100">
+                      <span className="inline-block text-[10px] font-bold px-2 py-0.5 rounded-full border" style={{ background: "var(--success-dim)", color: "var(--icon-success-text)", borderColor: "var(--success-border)" }}>
                         Clear
                       </span>
                     )}
