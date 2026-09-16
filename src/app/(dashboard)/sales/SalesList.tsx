@@ -177,56 +177,53 @@ export function SalesList({ sales }: { sales: SaleRow[] }) {
         </Link>
       </div>
 
-      {/* ── Today's Quick Summary Metrics ── */}
-      <div className="grid grid-cols-2 gap-3">
+      {/* ── Hero: Sales Today ── */}
+      <div
+        className="rounded-2xl p-5 relative overflow-hidden"
+        style={{
+          background: "linear-gradient(135deg, var(--bg-base) 0%, var(--accent-dim) 100%)",
+          border: "1px solid var(--accent-border)",
+          boxShadow: "var(--card-shadow)",
+        }}
+      >
         <div
-          className="rounded-2xl p-3.5 space-y-1.5 border bg-white"
-          style={{ borderColor: "var(--border-color)", boxShadow: "var(--card-shadow)" }}
-        >
-          <div className="flex items-center justify-between">
-            <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
-              Sales Today
-            </p>
-            <div
-              className="w-7 h-7 rounded-full flex items-center justify-center"
-              style={{ background: "var(--icon-success-bg)", color: "var(--icon-success-text)" }}
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5">
-                <path d="M3.375 19.5h17.25m-17.25 0a1.125 1.125 0 0 1-1.125-1.125M3.375 19.5h7.5c.621 0 1.125-.504 1.125-1.125m-9.75 0V5.625m0 12.75v-1.5c0-.621.504-1.125 1.125-1.125m18.375 2.625V5.625m0 12.75c0 .621-.504 1.125-1.125 1.125m1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125m0 3.75h-7.5A1.125 1.125 0 0 1 12 18.375m9.75-12.75c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125m19.5 0v1.5c0 .621-.504 1.125-1.125 1.125M2.25 5.625v1.5c0 .621.504 1.125 1.125 1.125m0 0h17.25m-17.25 0h7.5c.621 0 1.125.504 1.125 1.125M3.375 8.25c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125m17.25-3.75h-7.5c-.621 0-1.125.504-1.125 1.125m8.625-1.125c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125M12 10.875v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 10.875c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125M13.125 12h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125M20.625 12c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5M12 14.625v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 14.625c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125m0 1.5v-1.5m0 0c0-.621.504-1.125 1.125-1.125m0 0h7.5" />
-              </svg>
-            </div>
-          </div>
-          <p className="text-base font-bold leading-tight" style={{ color: "var(--text-primary)" }}>
+          className="absolute -right-12 -bottom-12 w-48 h-48 rounded-full pointer-events-none opacity-40 blur-2xl"
+          style={{ background: "var(--accent)" }}
+        />
+
+        <div className="relative z-10">
+          <span className="text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 mb-2" style={{ color: "var(--icon-accent-text)" }}>
+            <span className="w-2 h-2 rounded-full inline-block animate-pulse" style={{ background: "var(--accent)" }} />
+            Sales Today
+          </span>
+          <p className="text-3xl sm:text-4xl font-black tracking-tight" style={{ color: "var(--text-primary)" }}>
             {formatNaira(todayTotal)}
           </p>
-          <p className="text-[11px]" style={{ color: "var(--text-muted)" }}>
+          <p className="text-xs mt-1" style={{ color: "var(--icon-accent-text)" }}>
             {todaySales.length} transaction{todaySales.length !== 1 ? "s" : ""} today
           </p>
-        </div>
 
-        <div
-          className="rounded-2xl p-3.5 space-y-1.5 border bg-white"
-          style={{ borderColor: "var(--border-color)", boxShadow: "var(--card-shadow)" }}
-        >
+          <div className="h-px my-3.5" style={{ background: "var(--accent-border)" }} />
+
           <div className="flex items-center justify-between">
-            <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>
-              Transfer Funds
-            </p>
-            <div
-              className="w-7 h-7 rounded-full flex items-center justify-center"
-              style={{ background: "var(--info-dim)", color: "var(--icon-info-text)" }}
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5">
-                <path d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
-              </svg>
+            <div className="flex items-center gap-2.5">
+              <div
+                className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+                style={{ background: "var(--info-dim)", color: "var(--icon-info-text)" }}
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+                  <path d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-[11px]" style={{ color: "var(--text-muted)" }}>Transfer Funds</p>
+                <p className="text-sm font-bold" style={{ color: "var(--text-primary)" }}>{formatNaira(totalTransferFunds)}</p>
+              </div>
             </div>
+            <span className="text-[11px]" style={{ color: "var(--text-muted)" }}>
+              {bankEntries.length} bank{bankEntries.length !== 1 ? "s" : ""}
+            </span>
           </div>
-          <p className="text-base font-bold leading-tight" style={{ color: "var(--text-primary)" }}>
-            {formatNaira(totalTransferFunds)}
-          </p>
-          <p className="text-[11px]" style={{ color: "var(--text-muted)" }}>
-            Across {bankEntries.length} bank account{bankEntries.length !== 1 ? "s" : ""}
-          </p>
         </div>
       </div>
 
@@ -373,7 +370,10 @@ export function SalesList({ sales }: { sales: SaleRow[] }) {
           </div>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div
+          className="rounded-2xl overflow-hidden divide-y divide-[var(--border-color)]"
+          style={{ background: "var(--bg-card)", boxShadow: "var(--card-shadow)", border: "1px solid var(--border-color)" }}
+        >
           {filtered.map((sale) => {
             const isVoided = sale.status === "voided" || sale.notes?.startsWith("[VOIDED]");
             const customerObj = (Array.isArray(sale.credit_sales) ? sale.credit_sales[0] : sale.credit_sales) as {
@@ -384,13 +384,8 @@ export function SalesList({ sales }: { sales: SaleRow[] }) {
             return (
               <div
                 key={sale.id}
-                className={`rounded-2xl border p-4 transition-all bg-white ${
-                  isVoided ? "opacity-60 bg-[var(--icon-neutral-bg)] border-[var(--border-color)]" : ""
-                }`}
-                style={{
-                  borderColor: isVoided ? "var(--border-color)" : "var(--border-color)",
-                  boxShadow: isVoided ? "none" : "var(--card-shadow)",
-                }}
+                className="p-4 transition-all"
+                style={{ background: isVoided ? "var(--icon-neutral-bg)" : "transparent", opacity: isVoided ? 0.6 : 1 }}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
