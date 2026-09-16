@@ -63,14 +63,14 @@ function isTodayInLagos(isoDate: string): boolean {
 function PaymentBadge({ method, bankName }: { method: string; bankName?: string | null }) {
   if (method === "cash") {
     return (
-      <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full" style={{ background: "rgba(22,163,74,0.1)", color: "var(--success)" }}>
+      <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full" style={{ background: "var(--success-dim)", color: "var(--icon-success-text)" }}>
         CASH
       </span>
     );
   }
   if (method === "transfer") {
     return (
-      <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full flex items-center gap-1" style={{ background: "rgba(59,130,246,0.1)", color: "#2563eb" }}>
+      <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full flex items-center gap-1" style={{ background: "var(--info-dim)", color: "var(--icon-info-text)" }}>
         <span>TRANSFER</span>
         {bankName && <span className="font-semibold opacity-85">({bankName})</span>}
       </span>
@@ -191,8 +191,8 @@ export function SalesList({ sales }: { sales: SaleRow[] }) {
               className="w-7 h-7 rounded-full flex items-center justify-center"
               style={{ background: "var(--icon-success-bg)", color: "var(--icon-success-text)" }}
             >
-              <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5">
-                <path d="M2.25 4.5c0-.83.67-1.5 1.5-1.5h16.5c.83 0 1.5.67 1.5 1.5v15c0 .83-.67 1.5-1.5 1.5H3.75c-.83 0-1.5-.67-1.5-1.5v-15zM3.75 6v3h16.5V6H3.75zm16.5 6H3.75v7.5h16.5V12z" />
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5">
+                <path d="M3.375 19.5h17.25m-17.25 0a1.125 1.125 0 0 1-1.125-1.125M3.375 19.5h7.5c.621 0 1.125-.504 1.125-1.125m-9.75 0V5.625m0 12.75v-1.5c0-.621.504-1.125 1.125-1.125m18.375 2.625V5.625m0 12.75c0 .621-.504 1.125-1.125 1.125m1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125m0 3.75h-7.5A1.125 1.125 0 0 1 12 18.375m9.75-12.75c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125m19.5 0v1.5c0 .621-.504 1.125-1.125 1.125M2.25 5.625v1.5c0 .621.504 1.125 1.125 1.125m0 0h17.25m-17.25 0h7.5c.621 0 1.125.504 1.125 1.125M3.375 8.25c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125m17.25-3.75h-7.5c-.621 0-1.125.504-1.125 1.125m8.625-1.125c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125M12 10.875v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 10.875c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125M13.125 12h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125M20.625 12c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5M12 14.625v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 14.625c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125m0 1.5v-1.5m0 0c0-.621.504-1.125 1.125-1.125m0 0h7.5" />
               </svg>
             </div>
           </div>
@@ -214,11 +214,10 @@ export function SalesList({ sales }: { sales: SaleRow[] }) {
             </p>
             <div
               className="w-7 h-7 rounded-full flex items-center justify-center"
-              style={{ background: "rgba(59,130,246,0.1)", color: "#2563eb" }}
+              style={{ background: "var(--info-dim)", color: "var(--icon-info-text)" }}
             >
-              <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5">
-                <path d="M11.584 2.25a.75.75 0 01.832 0l9 6a.75.75 0 010 1.252l-9 6a.75.75 0 01-.832 0l-9-6a.75.75 0 010-1.252l9-6z" />
-                <path d="M12 21.75a.75.75 0 01-.416-.126l-9-6a.75.75 0 01.832-1.248L12 20.088l8.584-5.722a.75.75 0 11.832 1.248l-9 6A.75.75 0 0112 21.75z" />
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5">
+                <path d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
               </svg>
             </div>
           </div>
@@ -262,8 +261,8 @@ export function SalesList({ sales }: { sales: SaleRow[] }) {
                 onClick={() => setPaymentFilter(tab.id)}
                 className={`flex-1 py-1.5 px-3 rounded-xl text-xs font-bold transition-all whitespace-nowrap text-center ${
                   isSelected
-                    ? "bg-stone-900 text-white shadow-2xs"
-                    : "text-stone-500 hover:text-stone-900 hover:bg-stone-50"
+                    ? "bg-[var(--text-primary)] text-white shadow-sm"
+                    : "text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--icon-neutral-bg)]"
                 }`}
               >
                 {tab.label}
@@ -275,14 +274,14 @@ export function SalesList({ sales }: { sales: SaleRow[] }) {
         {/* Bank Account Funds Breakdown Card */}
         {paymentFilter === "transfer" && bankEntries.length > 0 && (
           <div
-            className="p-4 rounded-2xl border bg-blue-50/50 space-y-2"
-            style={{ borderColor: "rgba(59,130,246,0.2)" }}
+            className="p-4 rounded-2xl border space-y-2"
+            style={{ background: "var(--info-dim)", borderColor: "var(--info-border)" }}
           >
             <div className="flex justify-between items-center">
-              <p className="text-xs font-extrabold uppercase tracking-wider text-blue-900">
+              <p className="text-xs font-extrabold uppercase tracking-wider">
                 Bank Accounts & Funds
               </p>
-              <span className="text-[11px] font-bold text-blue-700">
+              <span className="text-[11px] font-bold" style={{ color: "var(--icon-info-text)" }}>
                 Total: {formatNaira(totalTransferFunds)}
               </span>
             </div>
@@ -290,12 +289,12 @@ export function SalesList({ sales }: { sales: SaleRow[] }) {
               {bankEntries.map(([bank, total]) => (
                 <div
                   key={bank}
-                  className="flex justify-between items-center p-2.5 bg-white rounded-xl border border-blue-100 text-xs shadow-2xs"
+                  className="flex justify-between items-center p-2.5 rounded-xl border text-xs shadow-sm" style={{ background: "var(--bg-card)", borderColor: "var(--info-border)" }}
                 >
-                  <span className="font-medium text-stone-700 truncate pr-2">
+                  <span className="font-medium truncate pr-2" style={{ color: "var(--text-primary)" }}>
                     🏦 {bank}
                   </span>
-                  <span className="font-bold text-blue-700 flex-shrink-0">
+                  <span className="font-bold flex-shrink-0" style={{ color: "var(--icon-info-text)" }}>
                     {formatNaira(total)}
                   </span>
                 </div>
@@ -307,11 +306,11 @@ export function SalesList({ sales }: { sales: SaleRow[] }) {
 
       {/* ── Void Sale Confirmation Modal ── */}
       {confirmSale && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
           <div className="bg-white rounded-2xl max-w-sm w-full p-5 border shadow-xl space-y-4" style={{ borderColor: "var(--border-color)" }}>
-            <div className="w-10 h-10 rounded-full bg-red-50 text-red-600 flex items-center justify-center">
-              <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-                <path fillRule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z" clipRule="evenodd" />
+            <div className="w-10 h-10 rounded-full bg-[var(--icon-danger-bg)] text-[var(--icon-danger-text)] flex items-center justify-center">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+                <path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
               </svg>
             </div>
 
@@ -325,7 +324,7 @@ export function SalesList({ sales }: { sales: SaleRow[] }) {
             </div>
 
             {errorMsg && (
-              <div className="text-xs font-semibold p-2.5 rounded-xl bg-red-50 border border-red-200 text-red-600">
+              <div className="text-xs font-semibold p-2.5 rounded-xl bg-[var(--icon-danger-bg)] border border-[var(--danger-border)] text-[var(--icon-danger-text)]">
                 {errorMsg}
               </div>
             )}
@@ -335,7 +334,7 @@ export function SalesList({ sales }: { sales: SaleRow[] }) {
                 type="button"
                 disabled={voiding}
                 onClick={() => setConfirmSale(null)}
-                className="flex-1 py-2.5 rounded-xl text-xs font-semibold border bg-stone-50 hover:bg-stone-100 transition-colors"
+                className="flex-1 py-2.5 rounded-xl text-xs font-semibold border bg-[var(--icon-neutral-bg)] hover:opacity-80 transition-colors"
                 style={{ borderColor: "var(--border-color)", color: "var(--text-primary)" }}
               >
                 Cancel
@@ -344,7 +343,7 @@ export function SalesList({ sales }: { sales: SaleRow[] }) {
                 type="button"
                 disabled={voiding}
                 onClick={handleConfirmVoid}
-                className="flex-1 py-2.5 rounded-xl text-xs font-bold text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 transition-colors shadow-sm"
+                className="flex-1 py-2.5 rounded-xl text-xs font-bold text-white bg-[var(--danger)] hover:opacity-90 disabled:opacity-50 transition-colors shadow-sm"
               >
                 {voiding ? "Voiding..." : "Yes, Void Sale"}
               </button>
@@ -359,9 +358,9 @@ export function SalesList({ sales }: { sales: SaleRow[] }) {
           className="rounded-2xl border p-10 text-center bg-white space-y-3"
           style={{ borderColor: "var(--border-color)", boxShadow: "var(--card-shadow)" }}
         >
-          <div className="w-12 h-12 rounded-full bg-stone-100 text-stone-400 flex items-center justify-center mx-auto">
-            <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
-              <path fillRule="evenodd" d="M2.25 4.5c0-.83.67-1.5 1.5-1.5h16.5c.83 0 1.5.67 1.5 1.5v15c0 .83-.67 1.5-1.5 1.5H3.75c-.83 0-1.5-.67-1.5-1.5v-15zM3.75 6v3h16.5V6H3.75zm16.5 6H3.75v7.5h16.5V12z" clipRule="evenodd" />
+          <div className="w-12 h-12 rounded-full bg-[var(--icon-neutral-bg)] text-[var(--icon-neutral-text)] flex items-center justify-center mx-auto">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
+              <path d="M3.375 19.5h17.25m-17.25 0a1.125 1.125 0 0 1-1.125-1.125M3.375 19.5h7.5c.621 0 1.125-.504 1.125-1.125m-9.75 0V5.625m0 12.75v-1.5c0-.621.504-1.125 1.125-1.125m18.375 2.625V5.625m0 12.75c0 .621-.504 1.125-1.125 1.125m1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125m0 3.75h-7.5A1.125 1.125 0 0 1 12 18.375m9.75-12.75c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125m19.5 0v1.5c0 .621-.504 1.125-1.125 1.125M2.25 5.625v1.5c0 .621.504 1.125 1.125 1.125m0 0h17.25m-17.25 0h7.5c.621 0 1.125.504 1.125 1.125M3.375 8.25c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125m17.25-3.75h-7.5c-.621 0-1.125.504-1.125 1.125m8.625-1.125c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125M12 10.875v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 10.875c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125M13.125 12h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125M20.625 12c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5M12 14.625v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 14.625c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125m0 1.5v-1.5m0 0c0-.621.504-1.125 1.125-1.125m0 0h7.5" />
             </svg>
           </div>
           <div>
@@ -386,7 +385,7 @@ export function SalesList({ sales }: { sales: SaleRow[] }) {
               <div
                 key={sale.id}
                 className={`rounded-2xl border p-4 transition-all bg-white ${
-                  isVoided ? "opacity-60 bg-stone-50 border-stone-200" : ""
+                  isVoided ? "opacity-60 bg-[var(--icon-neutral-bg)] border-[var(--border-color)]" : ""
                 }`}
                 style={{
                   borderColor: isVoided ? "var(--border-color)" : "var(--border-color)",
@@ -401,7 +400,7 @@ export function SalesList({ sales }: { sales: SaleRow[] }) {
                         {formatDate(sale.created_at)}
                       </span>
                       {isVoided && (
-                        <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-red-100 text-red-700">
+                        <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-[var(--icon-danger-bg)] text-[var(--icon-danger-text)]">
                           VOIDED
                         </span>
                       )}
@@ -409,9 +408,9 @@ export function SalesList({ sales }: { sales: SaleRow[] }) {
 
                     {/* Customer Name if Credit Sale */}
                     {customerName && (
-                      <p className="text-xs font-bold text-stone-800 mt-1 flex items-center gap-1">
-                        <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5 text-stone-400">
-                          <path fillRule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.6-7.812-1.7a.75.75 0 01-.437-.695z" clipRule="evenodd" />
+                      <p className="text-xs font-bold mt-1 flex items-center gap-1" style={{ color: "var(--text-primary)" }}>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5 text-[var(--icon-neutral-text)]">
+                          <path d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                         </svg>
                         <span>Customer: {customerName}</span>
                       </p>
@@ -420,7 +419,7 @@ export function SalesList({ sales }: { sales: SaleRow[] }) {
                     {/* Sale Items List */}
                     <div className="mt-2 space-y-1">
                       {sale.sale_items?.map((item, idx) => (
-                        <p key={idx} className="text-xs font-medium text-stone-700 truncate">
+                        <p key={idx} className="text-xs font-medium truncate" style={{ color: "var(--text-muted)" }}>
                           {item.quantity}x {item.products?.name || "Product Item"}
                         </p>
                       ))}
@@ -430,7 +429,7 @@ export function SalesList({ sales }: { sales: SaleRow[] }) {
                   <div className="text-right flex-shrink-0 space-y-2">
                     <p
                       className={`text-base font-black ${
-                        isVoided ? "line-through text-stone-400" : "text-stone-900"
+                        isVoided ? "line-through text-[var(--icon-neutral-text)]" : "text-[var(--text-primary)]"
                       }`}
                     >
                       {formatNaira(sale.total_amount)}
@@ -440,7 +439,7 @@ export function SalesList({ sales }: { sales: SaleRow[] }) {
                       <button
                         type="button"
                         onClick={() => setConfirmSale(sale)}
-                        className="text-[11px] font-bold text-red-600 hover:text-red-800 underline decoration-red-200 transition-colors"
+                        className="text-[11px] font-bold text-[var(--icon-danger-text)] hover:opacity-80 underline decoration-[var(--danger-border)] transition-colors"
                       >
                         Void Sale
                       </button>
